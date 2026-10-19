@@ -478,6 +478,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px 
   .sidebar-search input { min-height: 44px; font-size: 1rem; }
   .slide-nav-item { min-height: 48px; justify-content: center; }
   .viewport {
+    order: 2;
     flex: none;
     overflow-y: visible;
     padding: 16px 14px;
@@ -521,11 +522,13 @@ button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px 
   .center-note.big { font-size: 1rem; overflow-wrap: anywhere; }
   .custom-table th, .custom-table td { padding: 10px 12px; font-size: 0.82rem; }
   .drawer {
+    order: 1;
     width: 100%;
     flex: none;
     overflow-y: visible;
     border-left: none;
-    border-top: 2px solid var(--border-color);
+    border-top: none;
+    border-bottom: 2px solid var(--border-color);
     margin-right: 0 !important;
   }
   .drawer.closed { display: none !important; }
@@ -595,7 +598,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px 
   </main>
   <aside class="drawer" id="drawer">
     <div class="drawer-header">
-      <div class="drawer-title">🎙️ 逐字稿與問答 (Script &amp; Q&amp;A)</div>
+      <div class="drawer-title">🎙️ 逐字稿與問答 <span id="drawer-slide-tag" class="mobile-only" style="color:var(--text-primary);font-weight:800;font-size:0.85rem;background:rgba(56,189,248,0.18);padding:2px 8px;border-radius:999px;"></span></div>
       <button class="btn-action" onclick="toggleNotes()" aria-label="關閉逐字稿">✕</button>
     </div>
     <div class="drawer-content" id="drawer-content"></div>
@@ -857,7 +860,10 @@ function renderSlide() {
   const cat = document.getElementById('slide-category');
   cat.innerText = s.category;
   cat.className = 'category-pill' + (s.is_appendix ? ' appendix' : '');
+  const progText = s.is_appendix ? `Backup ${s.nav_tag} (${s.id}/${slides.length})` : `Slide ${s.id} / ${APPENDIX_START}`;
   document.getElementById('slide-progress').innerText = s.is_appendix ? `Backup · Slide ${s.id} / ${slides.length}` : `Slide ${s.id} / ${APPENDIX_START}`;
+  const dTag = document.getElementById('drawer-slide-tag');
+  if (dTag) dTag.innerText = progText;
   document.getElementById('slide-title').innerText = s.title;
   document.getElementById('slide-body').innerHTML = s.content;
   document.getElementById('drawer-content').innerHTML = s.notes_html;
