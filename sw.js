@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'hc2026-presenter-v2';
+﻿const CACHE_NAME = 'hc2026-presenter-v3';
 const ASSETS = ['./', './index.html', './HealthCom_presenter.html'];
 
 self.addEventListener('install', (event) => {
