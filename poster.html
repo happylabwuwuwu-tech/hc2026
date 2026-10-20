@@ -396,11 +396,19 @@
       color: #e2e8f0;
       line-height: 1.6;
     }
+    .qa-answer-zh {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.4);
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      line-height: 1.5;
+    }
     .qa-note {
       font-size: 0.85rem;
-      color: #cbd5e1;
-      background: rgba(56, 189, 248, 0.08);
-      border-left: 3px solid var(--accent-cyan);
+      color: #fed7aa;
+      background: rgba(251, 146, 60, 0.1);
+      border-left: 3px solid #fb923c;
       padding: 8px 10px;
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     }
@@ -586,9 +594,9 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      max-width: 720px;
+      max-width: 840px;
       width: 100%;
-      max-height: 85vh;
+      max-height: 88vh;
       display: flex;
       flex-direction: column;
       box-shadow: var(--shadow-lg);
@@ -617,11 +625,71 @@
       line-height: 1;
     }
     .modal-body {
-      padding: 20px;
+      padding: 18px 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 14px;
+    }
+
+    /* QA Filter Toolbar */
+    .qa-filter-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(30, 41, 59, 0.6);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+    .qa-search-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px;
+      background: #0f172a;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-size: 0.92rem;
+      outline: none;
+    }
+    .qa-search-input:focus { border-color: var(--accent-cyan); }
+    .qa-cat-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .qa-cat-pills::-webkit-scrollbar { display: none; }
+    .qa-cat-pill {
+      white-space: nowrap;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .qa-cat-pill:hover { border-color: var(--accent-cyan); color: var(--text-main); }
+    .qa-cat-pill.active {
+      background: var(--accent-cyan);
+      color: #090d16;
+      border-color: var(--accent-cyan);
+    }
+    .qa-cat-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin-right: 6px;
     }
 
     /* Numbers Table */
@@ -697,6 +765,7 @@
       .script-sentence { font-size: 1.05rem; padding: 4px 6px; }
       .translation-box { font-size: 0.9rem; padding: 10px 12px; }
       .step-pill { min-width: 36px; height: 38px; }
+      .modal-card { max-height: 92vh; }
     }
   </style>
 </head>
@@ -717,7 +786,7 @@
       <button class="btn-nav btn-step-nav" id="btn-prev" onclick="prevStep()">◀ 上一段</button>
       <button class="btn-nav btn-step-nav" id="btn-next" onclick="nextStep()">下一段 ▶</button>
       <button class="btn-nav" onclick="openModal('num-modal')">🔢 數字速查</button>
-      <button class="btn-nav" onclick="openModal('qa-modal')">🛡️ 必答題庫</button>
+      <button class="btn-nav" onclick="openModal('qa-modal')">🛡️ 必答題庫 (18)</button>
     </div>
   </header>
 
@@ -834,118 +903,46 @@
     </div>
   </div>
 
-  <!-- QA Modal -->
+  <!-- Comprehensive 18-Question QA Modal -->
   <div class="modal-backdrop" id="qa-modal" onclick="closeModalOnBackdrop(event, 'qa-modal')">
-    <div class="modal-card" style="max-width: 800px;">
+    <div class="modal-card" style="max-width: 860px;">
       <div class="modal-header">
-        <div class="modal-title">🛡️ 海報評審必問 7 題庫（含應答心法）</div>
+        <div class="modal-title">🛡️ 海報評審必備 Q&A 題庫（共 18 題 · 即時檢索）</div>
         <button class="btn-close" onclick="closeModal('qa-modal')">&times;</button>
       </div>
       <div class="modal-body">
         
-        <details class="qa-details" open>
-          <summary class="qa-summary">❓ Q1. 臨床試驗做過了嗎？有沒有長者改善的數據？</summary>
-          <div class="qa-body">
-            <div class="qa-answer">
-              <strong>💡 建議回答 (English):</strong><br>
-              "The software development and service architecture are completed, but the facility-based clinical evaluation has not yet been conducted. In this paper, we report the workflow-aware service design, implementation principles, and the 12-week evaluation protocol under IRB approval NYCU112062AF."
-            </div>
-            <div class="qa-note">
-              📝 <strong>應答心法 (GAMMA 誠實準則)：</strong>千萬不要為了好看而捏造臨床療效或宣稱「已經證明有效」。誠實說明本篇是報告「系統開發、服務設計與前瞻臨床評估研究計畫」。
-            </div>
+        <!-- Filter Bar -->
+        <div class="qa-filter-bar">
+          <input type="text" class="qa-search-input" id="qa-search" placeholder="🔍 搜尋問題、量表或關鍵字（如: IRB, SPMSQ, 照護員, 離線, 費用...）" oninput="filterQA()">
+          <div class="qa-cat-pills">
+            <span class="qa-cat-pill active" onclick="filterQACat('all', this)">全部 (18)</span>
+            <span class="qa-cat-pill" onclick="filterQACat('clinical', this)">🩺 臨床與機制 (4)</span>
+            <span class="qa-cat-pill" onclick="filterQACat('workflow', this)">👥 服務與工作流 (4)</span>
+            <span class="qa-cat-pill" onclick="filterQACat('tech', this)">💻 技術與資安 (3)</span>
+            <span class="qa-cat-pill" onclick="filterQACat('method', this)">📊 試驗與統計 (4)</span>
+            <span class="qa-cat-pill" onclick="filterQACat('adoption', this)">🏛️ 政策與推廣 (3)</span>
           </div>
-        </details>
+        </div>
 
-        <details class="qa-details">
-          <summary class="qa-summary">❓ Q2. 什麼是學習療法（Learning Therapy）？它跟一般平板遊戲有何不同？</summary>
-          <div class="qa-body">
-            <div class="qa-answer">
-              <strong>💡 建議回答 (English):</strong><br>
-              "Learning Therapy was pioneered by Dr. Kawashima in Japan, using structured oral reading and basic arithmetic to stimulate frontal brain regions. Unlike individual entertainment apps, our service is workflow-aware: it is built specifically for facility caregivers to lead small groups on a shared screen, eliminating manual worksheet preparation and isolated tablet use."
-            </div>
-            <div class="qa-note">
-              📝 <strong>應答心法：</strong>強調不是丟給長者單獨玩 iPad，而是「照護員帶領小團體」的工作流整合。
-            </div>
-          </div>
-        </details>
-
-        <details class="qa-details">
-          <summary class="qa-summary">❓ Q3. 為什麼堅持「小團體共用大螢幕」，而不是讓長者一人一台平板？</summary>
-          <div class="qa-body">
-            <div class="qa-answer">
-              <strong>💡 建議回答 (English):</strong><br>
-              "In institutional dementia care, many residents have motor, sensory, or visual limitations that make independent tablet interaction frustrating. A shared display guided by staff fosters interpersonal social interactions, prevents isolation, and allows the caregiver to pace the session safely."
-            </div>
-            <div class="qa-note">
-              📝 <strong>應答心法：</strong>點出機構長者的身體限制（手部顫抖、視力退化）與團體社交帶來的正面心理效益。
-            </div>
-          </div>
-        </details>
-
-        <details class="qa-details">
-          <summary class="qa-summary">❓ Q4. 你們強調的「臺灣在地化文化內容」具體指什麼？</summary>
-          <div class="qa-body">
-            <div class="qa-answer">
-              <strong>💡 建議回答 (English):</strong><br>
-              "Translated foreign materials often lack personal relevance for Taiwanese seniors. We incorporated culturally familiar proverbs, traditional Taiwanese holidays, local landmarks, and nostalgic life experiences into our reading and verbal fluency modules, which stimulates autobiographical memory and spontaneous participation."
-            </div>
-            <div class="qa-note">
-              📝 <strong>應答心法：</strong>說明本土文化記憶能喚起自傳式記憶 (autobiographical memory)，提升開口與參與動機。
-            </div>
-          </div>
-        </details>
-
-        <details class="qa-details">
-          <summary class="qa-summary">❓ Q5. 長者的隱私與機構資料安全如何控管？</summary>
-          <div class="qa-body">
-            <div class="qa-answer">
-              <strong>💡 建議回答 (English):</strong><br>
-              "All resident activity logs are linked to de-identified study IDs with role-restricted permissions. No identifiable health records reside on the client screen, complying with institutional data governance and our approved IRB protocol."
-            </div>
-            <div class="qa-note">
-              📝 <strong>應答心法：</strong>去識別化 (De-identified) 與角色權限控管 (Role-restricted)，符合 IRB 規範。
-            </div>
-          </div>
-        </details>
-
-        <details class="qa-details">
-          <summary class="qa-summary">❓ Q6. 12 週試驗預計採用什麼統計模型分析？為什麼不用傳統 t 檢定？</summary>
-          <div class="qa-body">
-            <div class="qa-answer">
-              <strong>💡 建議回答 (English):</strong><br>
-              "We plan to use baseline-adjusted Linear Mixed-Effects Models (LMM) or Generalized Estimating Equations (GEE). Because measurements are taken longitudinally within group cohorts, LMM and GEE properly handle repeated within-subject correlation and group clustering, which simple t-tests cannot accommodate."
-            </div>
-            <div class="qa-note">
-              📝 <strong>應答心法：</strong>展現對長期追蹤 (longitudinal repeated measures) 與群體聚集效應 (clustering) 的統計嚴謹度。
-            </div>
-          </div>
-        </details>
-
-        <details class="qa-details">
-          <summary class="qa-summary">❓ Q7. 本篇論文對 IEEE HealthCom 的最大貢獻是什麼？</summary>
-          <div class="qa-body">
-            <div class="qa-answer">
-              <strong>💡 建議回答 (English):</strong><br>
-              "Our primary contribution is bridging the gap between digital health technology and real-world caregiving workflow. Rather than adding administrative burden, our app co-designs reusable group modules, automated session documentation, and cultural adaptation to enable sustainable eHealth deployment in dementia care."
-            </div>
-            <div class="qa-note">
-              📝 <strong>應答心法：</strong>點題「Workflow-Aware eHealth Service」——這正是 HealthCom 研討會最看重的落地實用價值。
-            </div>
-          </div>
-        </details>
+        <!-- QA List Container -->
+        <div class="qa-accordion" id="modal-qa-list">
+          <!-- Rendered by JS -->
+        </div>
 
       </div>
     </div>
   </div>
 
   <script>
-    // Injected Step Data
-    const STEPS = [{"id": 1, "step_num": 1, "title_zh": "1. 開場招呼與研究介紹", "title_en": "Greeting & Introduction", "timing": "0:00 - 0:35", "word_count": 45, "target_area": "Poster Header & Abstract", "image": "poster_assets/step1_intro.jpg", "hotspot": {"top": "0%", "left": "0%", "width": "100%", "height": "25%"}, "script_en": ["Hi! Thanks for stopping by!", "Would you like a quick overview of our project?", "Our project is the Smart Learning App.", "It's designed to support cognitive stimulation for older adults with dementia in long-term care facilities."], "script_zh": "嗨！謝謝你過來看看我們的海報！你想要我簡單介紹一下我們的研究嗎？我們的研究計畫稱為「智慧學習應用程式（Smart Learning App）」，主要是為了協助長期照護機構中的失智症長者進行認知刺激活動而設計的。", "cue_zh": "親切熱情開場，主動詢問參觀者是否需要簡介，快速點明標題、目標族群（機構失智長者）與核心目標（認知刺激）。", "key_points": ["研究主題：Smart Learning App 服務設計", "目標對象：長期照護機構失智症長者 (LTC facilities)", "核心任務：照護員引導之低負擔、小團體認知刺激活動"], "qa": [{"q": "What is the primary target population of this app?", "a": "Older adults with mild-to-moderate dementia living in long-term care facilities, accompanied and guided by facility care staff in small groups.", "note": "強調是機構照護員帶領小團體，不是讓長者單獨操作平板。"}]}, {"id": 2, "step_num": 2, "title_zh": "2. 研究背景與開發動機", "title_en": "Background & Motivation", "timing": "0:35 - 1:15", "word_count": 53, "target_area": "Section I: INTRODUCTION", "image": "poster_assets/step2_background.jpg", "hotspot": {"top": "25%", "left": "0%", "width": "28%", "height": "40%"}, "script_en": ["The idea is simple.", "Activities like reading aloud and basic arithmetic can be helpful, but care staff often spend time preparing materials and documenting sessions.", "So, we developed a web-based app to make these activities easier to deliver."], "script_zh": "其實，這項研究的核心概念很簡單。像是朗讀和基礎數學計算這類認知刺激活動，對失智症長者可能具有正面的幫助。然而，照護人員往往需要花費許多時間準備教材，以及記錄每次活動的執行情況。因此，我們開發了一款網頁式應用程式，讓這些認知刺激活動更容易安排與執行。", "cue_zh": "點出問題與痛點：學習療法有效，但傳統紙本備課累、手寫紀錄煩；我們的 App 就是為了解決照護現場的負擔。", "key_points": ["學術根基：Learning Therapy（朗讀＋基礎數學計算）", "現場痛點 1：照護人力短缺，紙本備課與教材整理耗時", "現場痛點 2：手寫紀錄負擔重，缺乏活動歷程數位化追蹤", "解決方案：Web-based App 降低備課時間，使活動易於落實"], "qa": [{"q": "What is the theoretical background of Learning Therapy?", "a": "Learning Therapy was developed by Dr. Ryuta Kawashima in Japan, using simple arithmetic and reading aloud to activate prefrontal brain regions in older adults with cognitive impairment.", "note": "可提及川島隆太教授的學習療法，日本與臺灣均有先導研究經驗。"}]}, {"id": 3, "step_num": 3, "title_zh": "3. APP 主要功能", "title_en": "Main Features", "timing": "1:15 - 1:55", "word_count": 47, "target_area": "Center: App Modules & Screens", "image": "poster_assets/step3_features.jpg", "hotspot": {"top": "15%", "left": "28%", "width": "72%", "height": "50%"}, "script_en": ["If you look here, in the center of our poster, you'll see three activities: simple arithmetic, oral reading, and semantic verbal fluency.", "We also use culturally familiar content for older adults in Taiwan."], "script_zh": "如果你看一下我們海報的中央，可以看到 APP 提供的三項主要活動：簡單數學計算、朗讀，以及語意流暢度訓練。此外，我們也採用了符合臺灣文化背景的活動內容，讓臺灣長者能夠接觸到更加熟悉的教材。", "cue_zh": "眼神引導參觀者看海報中央的 App 介面截圖，強調三大核心模組與「臺灣在地化文化素材」的特色。", "key_points": ["模組 1：基礎數學計算 (Simple Arithmetic) · 活化前額葉腦區", "模組 2：朗讀訓練 (Oral Reading) · 增進語言與專注力", "模組 3：語意流暢度訓練 (Semantic Verbal Fluency) · 詞彙提取與互動", "核心亮點：臺灣本土文化素材（在地地名、童年俚語、傳統節慶）"], "qa": [{"q": "Why is cultural localization crucial for cognitive stimulation?", "a": "Cultural relevance triggers long-term autobiographical memory and emotional resonance, which promotes sustained attention and spontaneous speech in dementia care.", "note": "外國翻譯教材對本土長者常缺乏情感連結，本土化能顯著提高長者主動參與意願。"}]}, {"id": 4, "step_num": 4, "title_zh": "4. APP 服務設計與操作流程", "title_en": "Service Design & Workflow", "timing": "1:55 - 2:40", "word_count": 54, "target_area": "Section II: SERVICE DESIGN PRINCIPLES", "image": "poster_assets/step4_workflow.jpg", "hotspot": {"top": "65%", "left": "0%", "width": "28%", "height": "35%"}, "script_en": ["What's different is that the app is designed for small groups, not just individual use.", "Care staff guide the activities on a shared screen, with large text, adjustable pacing, and session records."], "script_zh": "這款 APP 比較特別的地方在於，它是專門為小團體活動所設計的，而不只是提供個別長者單獨使用。照護人員可以透過共用螢幕帶領長者進行活動，而 APP 也提供大字體顯示、可調整活動進行速度，以及活動紀錄等功能，讓照護人員在實際執行時更加方便。", "cue_zh": "說明最大差異點：小團體活動而非孤立玩平板！共用電視大螢幕、照護員控速、大字體、後台一鍵記錄。", "key_points": ["團體引導模式：6–10 位長者共用大螢幕，照護人員主持帶領", "介面親善：高對比大字體、節奏可控、降低視力與認知負荷", "行政數位化：自動記錄活動出席與完成狀態，省去紙本謄寫", "隱私權限控管：去識別化代碼，分層權限管理確保機構資安"], "qa": [{"q": "How does this service design support care staff in real-world facilities?", "a": "By shifting from manual worksheet preparation to leader-controlled digital modules, it reduces prep time and cognitive burden for caregivers, fostering consistent group facilitation.", "note": "強調 workflow-aware：順應既有團體活動流程，而非硬塞複雜技術給照護員。"}]}, {"id": 5, "step_num": 5, "title_zh": "5. 研究設計與成效評估", "title_en": "Study Design & Evaluation", "timing": "2:40 - 3:35", "word_count": 84, "target_area": "Section III: SERVICE METRICS, OUTCOMES, AND ANALYSIS", "image": "poster_assets/step5_evaluation.jpg", "hotspot": {"top": "65%", "left": "28%", "width": "54%", "height": "22%"}, "script_en": ["And down here is our evaluation plan.", "We're planning a twelve-week, two-arm study comparing app-supported sessions with time-matched routine activities.", "The app group will have two forty-five-minute sessions each week, with six to ten residents per group.", "We'll assess how feasible and user-friendly the service is, along with potential changes in cognition, mood, and behavior.", "The app has been developed, but the facility-based evaluation has not yet been conducted."], "script_zh": "接著，如果你看一下海報的下方，可以看到我們規劃的研究評估方式。我們預計進行一項為期 12 週的兩組比較研究，比較使用 APP 輔助進行的認知刺激活動，以及相同時間長度的常規活動。在 APP 介入組中，我們預計每週安排兩次活動，每次 45 分鐘，每組由 6 至 10 位長者參與。我們將評估這項服務在實際照護環境中的可行性與易用性，同時探討長者在認知功能、情緒及行為表現方面可能產生的變化。目前 APP 已經完成開發，但照護機構中的實際評估研究尚未進行。", "cue_zh": "報出精準量化試驗規格（12週、2組、每週2次、每次45分、每組6-10人）。最後一句務必誠實聲明：系統開發完成，機構實地評估預計進行中！", "key_points": ["試驗架構：12 週雙組前瞻對照（App 介入組 vs 等時常規活動組）", "介入劑量：每週 2 次、每次 45 分鐘、每組 6–10 位長者", "實施評估指標：可行性、忠誠度、滿意易用度 (SUS)、出席率、不良事件", "長者臨床指標：SPMSQ (整體認知)、FAB (執行功能)、GDS-SF15 (憂鬱)、CMAI (躁動行為)、60秒語意流暢度", "統計分析架構：基準線校正之線性混合效應模型 (LMM) 或廣義估計方程式 (GEE)", "⚠️ 學術誠實底線：系統完成開發，機構試驗預計進行中，勿宣稱已有臨床療效數據"], "qa": [{"q": "Have you started the clinical trial or observed resident outcomes?", "a": "The app development and trial protocol are finalized under IRB NYCU112062AF, and the facility evaluation is planned. We do not report resident outcome data in this paper.", "note": "⚠️ 核心原則：千萬不能捏造臨床效果數據，明言「完成系統開發，機構臨床評估預計進行中」。"}, {"q": "Why use Linear Mixed Models (LMM) or GEE for statistical analysis?", "a": "Because outcome measurements are repeated over time (baseline, week 12) within small groups. LMM and GEE properly model within-subject correlation and group clustering effects.", "note": "展示對長期追蹤與小群體重複測量統計模型的專業掌握。"}]}, {"id": 6, "step_num": 6, "title_zh": "6. 研究結論與結尾互動", "title_en": "Conclusion & Closing", "timing": "3:35 - 4:05", "word_count": 40, "target_area": "Section IV: CONTRIBUTIONS & CONCLUSION", "image": "poster_assets/step6_conclusion.jpg", "hotspot": {"top": "82%", "left": "28%", "width": "72%", "height": "18%"}, "script_en": ["Overall, our goal is to bring traditional cognitive stimulation into everyday long-term care in a practical, culturally relevant way.", "That's a quick overview!", "Is there anything you'd like to ask?"], "script_zh": "整體而言，我們的目標是透過一種實用且符合在地文化的方式，將傳統認知刺激活動融入長期照護機構的日常照護工作中。以上就是我們研究的簡單介紹！請問你有任何想進一步了解的地方嗎？", "cue_zh": "有力收尾，總結貢獻（實用性＋文化相關性＋低負擔），親切邀請現場提問與互動。", "key_points": ["研究核心貢獻：將紙本學習療法轉化為機構可永續運作的數位健康服務", "設計哲學：以照護現場工作流為中心，兼顧文化契合度與低負擔", "後續規劃：機構試驗驗證實施成效，並做為未來個別化與擴展之基礎", "計畫核准與資助：陽明交大人體試驗委員會 NYCU112062AF，嚴慶齡醫學基金會"], "qa": [{"q": "What is the primary contribution of this work to IEEE HealthCom?", "a": "We address the translational gap between digital health technology and clinical workflow in dementia care by designing a workflow-aware eHealth service platform ready for sustainable real-world adoption.", "note": "點出 IEEE HealthCom 最看重的「健康資訊系統落地導入與工作流整合」價值。"}]}];
+    const STEPS = [{"id": 1, "step_num": 1, "title_zh": "1. 開場招呼與研究介紹", "title_en": "Greeting & Introduction", "timing": "0:00 - 0:35", "word_count": 45, "target_area": "Poster Header & Abstract", "image": "poster_assets/step1_intro.jpg", "hotspot": {"top": "0%", "left": "0%", "width": "100%", "height": "25%"}, "script_en": ["Hi! Thanks for stopping by!", "Would you like a quick overview of our project?", "Our project is the Smart Learning App.", "It's designed to support cognitive stimulation for older adults with dementia in long-term care facilities."], "script_zh": "嗨！謝謝你過來看看我們的海報！你想要我簡單介紹一下我們的研究嗎？我們的研究計畫稱為「智慧學習應用程式（Smart Learning App）」，主要是為了協助長期照護機構中的失智症長者進行認知刺激活動而設計的。", "cue_zh": "親切熱情開場，主動詢問參觀者是否需要簡介，快速點明標題、目標族群（機構失智長者）與核心目標（認知刺激）。", "key_points": ["研究主題：Smart Learning App 服務設計", "目標對象：長期照護機構失智症長者 (LTC facilities)", "核心任務：照護員引導之低負擔、小團體認知刺激活動"], "qa": [{"id": "q4", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "What stages of dementia are eligible for this study, and can severe dementia patients participate?", "q_zh": "這項研究收案的失智症程度為何？重度失智長者也能參與嗎？", "a_en": "We target older adults with mild-to-moderate dementia (e.g., SPMSQ 3 to 7 errors, or CDR 1 to 2) who retain sufficient visual and auditory ability to engage with a shared display. Residents with severe dementia (CDR 3) or acute psychiatric instability are excluded, as structured verbal and arithmetic tasks require baseline receptive and expressive capacity.", "a_zh": "我們收案對象主要針對輕度至中度失智長者（例如 SPMSQ 錯 3–7 題，或 CDR 1–2 分），且具備基本視力與聽力以觀看共用螢幕。重度失智長者（CDR 3）或合併急性精神行為問題者會予以排除，因為結構化的朗讀與計算任務需要最基本的語言理解與表達功能。", "note": "明確認定適用邊界（輕中度為主），展示對長照臨床實務的精準了解。", "related_step": 1}]}, {"id": 2, "step_num": 2, "title_zh": "2. 研究背景與開發動機", "title_en": "Background & Motivation", "timing": "0:35 - 1:15", "word_count": 53, "target_area": "Section I: INTRODUCTION", "image": "poster_assets/step2_background.jpg", "hotspot": {"top": "25%", "left": "0%", "width": "28%", "height": "40%"}, "script_en": ["The idea is simple.", "Activities like reading aloud and basic arithmetic can be helpful, but care staff often spend time preparing materials and documenting sessions.", "So, we developed a web-based app to make these activities easier to deliver."], "script_zh": "其實，這項研究的核心概念很簡單。像是朗讀和基礎數學計算這類認知刺激活動，對失智症長者可能具有正面的幫助。然而，照護人員往往需要花費許多時間準備教材，以及記錄每次活動的執行情況。因此，我們開發了一款網頁式應用程式，讓這些認知刺激活動更容易安排與執行。", "cue_zh": "點出問題與痛點：學習療法有效，但傳統紙本備課累、手寫紀錄煩；我們的 App 就是為了解決照護現場的負擔。", "key_points": ["學術根基：Learning Therapy（朗讀＋基礎數學計算）", "現場痛點 1：照護人力短缺，紙本備課與教材整理耗時", "現場痛點 2：手寫紀錄負擔重，缺乏活動歷程數位化追蹤", "解決方案：Web-based App 降低備課時間，使活動易於落實"], "qa": [{"id": "q2", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "What is Learning Therapy, and how does your app differ from commercial tablet brain games?", "q_zh": "什麼是學習療法（Learning Therapy）？它跟市面上平板益智遊戲有何不同？", "a_en": "Learning Therapy was pioneered by Dr. Ryuta Kawashima in Japan, using structured oral reading and basic arithmetic to stimulate frontal brain regions. Unlike individual entertainment apps, our service is workflow-aware: it is built specifically for facility caregivers to lead small groups on a shared screen, eliminating manual worksheet preparation and isolated tablet use.", "a_zh": "學習療法源自日本東北大學川島隆太教授的研究，透過基礎數學計算與大聲朗讀來活化大腦前額葉。市售商業益智遊戲多偏向個人娛樂且需要長者自行操作，而我們的服務是工作流導向（workflow-aware）：專為機構照護員設計，帶領小團體在共用大螢幕上互動，解決紙本備課與長者獨自玩平板的疏離感。", "note": "強調不是把長者丟給平板玩，而是由照護人員主導的團體學習療法工作流整合。", "related_step": 2}]}, {"id": 3, "step_num": 3, "title_zh": "3. APP 主要功能", "title_en": "Main Features", "timing": "1:15 - 1:55", "word_count": 47, "target_area": "Center: App Modules & Screens", "image": "poster_assets/step3_features.jpg", "hotspot": {"top": "15%", "left": "28%", "width": "72%", "height": "50%"}, "script_en": ["If you look here, in the center of our poster, you'll see three activities: simple arithmetic, oral reading, and semantic verbal fluency.", "We also use culturally familiar content for older adults in Taiwan."], "script_zh": "如果你看一下我們海報的中央，可以看到 APP 提供的三項主要活動：簡單數學計算、朗讀，以及語意流暢度訓練。此外，我們也採用了符合臺灣文化背景的活動內容，讓臺灣長者能夠接觸到更加熟悉的教材。", "cue_zh": "眼神引導參觀者看海報中央的 App 介面截圖，強調三大核心模組與「臺灣在地化文化素材」的特色。", "key_points": ["模組 1：基礎數學計算 (Simple Arithmetic) · 活化前額葉腦區", "模組 2：朗讀訓練 (Oral Reading) · 增進語言與專注力", "模組 3：語意流暢度訓練 (Semantic Verbal Fluency) · 詞彙提取與互動", "核心亮點：臺灣本土文化素材（在地地名、童年俚語、傳統節慶）"], "qa": [{"id": "q5", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "What specific Taiwanese cultural localization was incorporated into the modules?", "q_zh": "你們強調的「臺灣在地化文化內容」具體包含哪些教材？", "a_en": "Translated foreign materials often lack personal relevance for Taiwanese seniors. We incorporated culturally familiar proverbs, traditional Taiwanese holidays, local landmarks, nostalgic life experiences, and colloquial phrases into our reading and verbal fluency modules, which stimulates autobiographical memory and spontaneous participation.", "a_zh": "外國引進的教材常因文化隔閡無法引起臺灣長者共鳴。我們特別挑選了本土俗諺、傳統節慶（如元宵猜燈謎、端午、中秋）、在地地名景點，以及長者年輕時熟悉的鄉土生活經驗，融入朗讀與語意流暢度模組，能有效誘發自傳式長期記憶（autobiographical memory），大幅提高主動開口參與的意願。", "note": "說明文化親和力能觸發長者的自傳式記憶，是提升參與率的認知神經學關鍵。", "related_step": 3}, {"id": "q11", "cat": "tech", "cat_zh": "技術與資安", "q_en": "What is the technical stack and hardware requirement for deployment?", "q_zh": "系統架構技術棧為何？需要採購昂貴的特殊硬體嗎？", "a_en": "The system requires no proprietary hardware. Frontend uses responsive HTML5, modern CSS3, and JavaScript optimized for 10-inch Android/iOS tablets and 55-inch+ facility TV screens via HDMI, Chromecast, or AirPlay. The backend runs on a lightweight RESTful API with relational database architecture, keeping deployment costs minimal.", "a_zh": "無需採購任何昂貴的特製硬體。前端為響應式 HTML5/CSS3/JavaScript，可在機構現有的 10 吋 iPad 或 Android 平板上執行，並可透過 HDMI 線、Chromecast 或 AirPlay 投放至機構大廳現有的 55 吋以上電視螢幕。後端採用輕量 RESTful API 與關聯式資料庫，極大化降低機構採購門檻。", "note": "強調相容現有設備，不需額外高昂硬體投資。", "related_step": 3}]}, {"id": 4, "step_num": 4, "title_zh": "4. APP 服務設計與操作流程", "title_en": "Service Design & Workflow", "timing": "1:55 - 2:40", "word_count": 54, "target_area": "Section II: SERVICE DESIGN PRINCIPLES", "image": "poster_assets/step4_workflow.jpg", "hotspot": {"top": "65%", "left": "0%", "width": "28%", "height": "35%"}, "script_en": ["What's different is that the app is designed for small groups, not just individual use.", "Care staff guide the activities on a shared screen, with large text, adjustable pacing, and session records."], "script_zh": "這款 APP 比較特別的地方在於，它是專門為小團體活動所設計的，而不只是提供個別長者單獨使用。照護人員可以透過共用螢幕帶領長者進行活動，而 APP 也提供大字體顯示、可調整活動進行速度，以及活動紀錄等功能，讓照護人員在實際執行時更加方便。", "cue_zh": "說明最大差異點：小團體活動而非孤立玩平板！共用電視大螢幕、照護員控速、大字體、後台一鍵記錄。", "key_points": ["團體引導模式：6–10 位長者共用大螢幕，照護人員主持帶領", "介面親善：高對比大字體、節奏可控、降低視力與認知負荷", "行政數位化：自動記錄活動出席與完成狀態，省去紙本謄寫", "隱私權限控管：去識別化代碼，分層權限管理確保機構資安"], "qa": [{"id": "q3", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "Why choose small group activities on a shared display instead of individual tablet use?", "q_zh": "為什麼堅持「小團體共用大螢幕」，而不是讓長者一人一台平板？", "a_en": "In institutional dementia care, many residents have sensory, motor, or visual limitations that make independent tablet interaction frustrating. A shared display guided by staff fosters interpersonal social interactions, prevents isolation, and allows the caregiver to pace the session safely.", "a_zh": "在長照機構中，許多失智長者伴隨手部顫抖、視力退化或觸控理解困難，個別操作平板常引發挫折感。透過照護員帶領共用大螢幕，不僅降低操作門檻，更能營造團體同儕互動氛圍，減少孤立感，並讓照護人員隨時掌握活動節奏與長者情緒。", "note": "點出機構長者的身體限制（視力、手部精細動作）與小團體同儕社交的心理正面效益。", "related_step": 4}, {"id": "q6", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "How much training do frontline care staff need to learn and operate this app?", "q_zh": "機構照護人員需要培訓多久才能上手操作？會不會增加排班負擔？", "a_en": "The system follows a zero-configuration design ethos. Frontline care staff need only a single 30-minute orientation session. The interface features large touch targets, preset daily activity modules, and automated one-touch attendance logging, significantly reducing material preparation time compared to paper worksheets.", "a_zh": "系統秉持「零複雜設定」原則，照護人員僅需一次 30 分鐘的實機教學即可上手。介面採用大按鈕設計、預設好每日活動模組，並支援一鍵點名與歷程儲存。相較於傳統需影印、剪裁紙本教材與手寫記錄，App 實際上大幅縮短了備課時間，反而減輕照護排班負擔。", "note": "強調 workflow-aware：不增加工作量，反而省下繁瑣紙本作業時間。", "related_step": 4}, {"id": "q7", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "How do caregivers handle resident agitation or refusal during group sessions?", "q_zh": "若長者在團體活動中情緒躁動或抗拒參與，照護員如何處理？", "a_en": "Facilitators can pause, slow down pacing, or change modules with a single tap. The protocol includes an agitation event log integrated with CMAI monitoring. If a resident exhibits persistent distress, the caregiver gently guides them to a quiet rest area with a secondary staff member, ensuring emotional safety without interrupting the group.", "a_zh": "照護員可一鍵暫停、減緩速度或切換至輕鬆模組。試驗標準作業程序（SOP）中整合了躁動事件記錄（與 CMAI 量表連動）。若長者出現持續排斥或情緒波動，會由協同工作人員溫和帶離至安靜區休息，在確保長者情緒安全的同時，維持團體其他長者的活動進行。", "note": "展示對失智症情緒行為（BPSD）有完善的臨床處置 SOP。", "related_step": 4}, {"id": "q9", "cat": "tech", "cat_zh": "技術與資安", "q_en": "How does the system ensure resident privacy and institutional data security?", "q_zh": "長者的隱私與機構資料安全如何控管？符合法規嗎？", "a_en": "All resident records are pseudonymized with de-identified study IDs and role-restricted permissions. No personally identifiable medical records are cached on the frontend presentation display. Data transfer is encrypted via TLS 1.3, complying with institutional data governance and IRB ethics approval NYCU112062AF.", "a_zh": "所有長者歷程紀錄皆以去識別化研究編號（De-identified IDs）代號化管理，並具備分層權限控管。前端投影螢幕上絕不留存長者身分證字號或病歷隱私資料。系統所有傳輸均採 TLS 1.3 加密，完全符合臺灣個人資料保護法與 NYCU112062AF 人體試驗委員會規範。", "note": "強調去識別化、角色權限控管 (RBAC) 與通過 IRB 倫理審查。", "related_step": 4}, {"id": "q10", "cat": "tech", "cat_zh": "技術與資安", "q_en": "Can the app operate if facility Wi-Fi is unstable or offline?", "q_zh": "機構網路若收訊不良或斷線，系統還能正常運作嗎？", "a_en": "Yes. The Smart Learning App is architected as a Progressive Web Application (PWA) with Service Worker caching. Once modules are loaded, the entire group activity can run completely offline on local tablets or TVs. Session logs are cached locally in encrypted browser storage and automatically sync to the server once connectivity resumes.", "a_zh": "完全可以。系統採用 Progressive Web Application (PWA) 架構並配備 Service Worker 離線快取機制。活動模組下載後，即使會場或機構完全無網路，仍可在本地平板或智慧電視離線流暢運作。活動紀錄會先加密存於本機，待網路恢復時自動同步回傳後台。", "note": "強調離線運作能力 (PWA)，切中長照機構經常 Wi-Fi 覆蓋不均的痛點。", "related_step": 4}]}, {"id": 5, "step_num": 5, "title_zh": "5. 研究設計與成效評估", "title_en": "Study Design & Evaluation", "timing": "2:40 - 3:35", "word_count": 84, "target_area": "Section III: SERVICE METRICS, OUTCOMES, AND ANALYSIS", "image": "poster_assets/step5_evaluation.jpg", "hotspot": {"top": "65%", "left": "28%", "width": "54%", "height": "22%"}, "script_en": ["And down here is our evaluation plan.", "We're planning a twelve-week, two-arm study comparing app-supported sessions with time-matched routine activities.", "The app group will have two forty-five-minute sessions each week, with six to ten residents per group.", "We'll assess how feasible and user-friendly the service is, along with potential changes in cognition, mood, and behavior.", "The app has been developed, but the facility-based evaluation has not yet been conducted."], "script_zh": "接著，如果你看一下海報的下方，可以看到我們規劃的研究評估方式。我們預計進行一項為期 12 週的兩組比較研究，比較使用 APP 輔助進行的認知刺激活動，以及相同時間長度的常規活動。在 APP 介入組中，我們預計每週安排兩次活動，每次 45 分鐘，每組由 6 至 10 位長者參與。我們將評估這項服務在實際照護環境中的可行性與易用性，同時探討長者在認知功能、情緒及行為表現方面可能產生的變化。目前 APP 已經完成開發，但照護機構中的實際評估研究尚未進行。", "cue_zh": "報出精準量化試驗規格（12週、2組、每週2次、每次45分、每組6-10人）。最後一句務必誠實聲明：系統開發完成，機構實地評估預計進行中！", "key_points": ["試驗架構：12 週雙組前瞻對照（App 介入組 vs 等時常規活動組）", "介入劑量：每週 2 次、每次 45 分鐘、每組 6–10 位長者", "實施評估指標：可行性、忠誠度、滿意易用度 (SUS)、出席率、不良事件", "長者臨床指標：SPMSQ (整體認知)、FAB (執行功能)、GDS-SF15 (憂鬱)、CMAI (躁動行為)、60秒語意流暢度", "統計分析架構：基準線校正之線性混合效應模型 (LMM) 或廣義估計方程式 (GEE)", "⚠️ 學術誠實底線：系統完成開發，機構試驗預計進行中，勿宣稱已有臨床療效數據"], "qa": [{"id": "q1", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "Have you conducted the clinical trial yet? What are your resident outcome data?", "q_zh": "臨床試驗做過了嗎？有沒有長者改善的數據？", "a_en": "The software development and service architecture are completed, but the facility-based clinical evaluation has not yet been conducted. In this paper, we report the workflow-aware service design, implementation principles, and the prospective 12-week evaluation protocol under IRB approval NYCU112062AF.", "a_zh": "軟體系統開發與服務架構已全部完成，但機構實地臨床評估尚未進行。本篇論文核心報告的是符合照護工作流的服務設計、實施架構，以及在陽明交大人體試驗委員會（NYCU112062AF）核准下的 12 週前瞻評估研究設計。", "note": "⚠️ 核心誠實原則：千萬不能捏造臨床療效或宣稱「已經證明有效」。誠實說明本篇是報告「系統開發、服務設計與前瞻臨床評估研究計畫」。", "related_step": 5}, {"id": "q8", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "Why 45 minutes twice weekly? What is the clinical rationale for this dosing?", "q_zh": "為什麼設定為「每週 2 次、每次 45 分鐘」？有何臨床依據？", "a_en": "This schedule aligns with clinical evidence from Cognitive Stimulation Therapy (CST) and original Learning Therapy protocols. Dementia patients typically experience attention fatigue after 30 to 45 minutes. A twice-weekly frequency maintains cognitive engagement while fitting smoothly into institutional activity calendars without displacing physical rehabilitation or dining.", "a_zh": "此劑量設計基於國際認知刺激治療（CST）與學習療法的實證研究。失智長者的專注力在持續 30–45 分鐘後常會下降；每週 2 次的頻率既能維持穩定的認知活化刺激，又能完美融入長照機構每週常規課表，不排擠復健治療與生活起居時間。", "note": "展示劑量設定背後的生理專注力極限與機構作息排程考量。", "related_step": 5}, {"id": "q12", "cat": "method", "cat_zh": "試驗與統計", "q_en": "Why choose SPMSQ and FAB instead of MMSE or MoCA as clinical endpoints?", "q_zh": "為何選擇 SPMSQ 與 FAB，而不是最常見的 MMSE 或 MoCA？", "a_en": "SPMSQ is a 10-item screening tool widely validated in Taiwanese long-term care settings that requires no paper drawing or writing, reducing testing anxiety and fatigue for frail residents. The Frontal Assessment Battery (FAB) specifically assesses executive function and cognitive flexibility, which directly maps onto the prefrontal activation mechanism of Learning Therapy.", "a_zh": "SPMSQ 在臺灣長照評鑑與臨床照護中已被廣泛採納，共 10 題口語問答，不需長者持筆書寫繪畫，能大幅減少衰弱長者的測驗焦慮與疲憊感。而額葉評估量表（FAB）專門評估執行功能、概念形成與抑制控制，恰好對應學習療法活化前額葉腦區的神經機制，最具敏感度。", "note": "展示對測驗負擔（SPMSQ 簡短免持筆）與機制對齊（FAB 測額葉）的深層考量。", "related_step": 5}, {"id": "q13", "cat": "method", "cat_zh": "試驗與統計", "q_en": "What statistical models will you use, and why not simple paired t-tests?", "q_zh": "12 週試驗預計採用什麼統計模型分析？為什麼不用成對 t 檢定？", "a_en": "We will evaluate group-by-time interaction effects using baseline-adjusted Linear Mixed-Effects Models (LMM) or Generalized Estimating Equations (GEE). These models handle correlated repeated measures over time and accommodate small-group clustering and missing data without discarding incomplete cases, which simple t-tests cannot achieve.", "a_zh": "我們將使用基準線校正之線性混合效應模型（LMM）或廣義估計方程式（GEE）來檢定「組別與時間的交互作用（group-by-time interaction）」。由於長者在 12 週內有重複測量，且長者嵌套於活動小組內，LMM 與 GEE 能妥善處理個體內相依性與群體聚集效應，並容納部分缺漏值，遠比傳統 t 檢定嚴謹可靠。", "note": "展現對長期追蹤 (longitudinal repeated measures) 與群體聚集效應 (clustering) 的統計嚴謹度。", "related_step": 5}, {"id": "q14", "cat": "method", "cat_zh": "試驗與統計", "q_en": "How do you ethically manage the control arm? Are they deprived of activities?", "q_zh": "對照組長者在 12 週內只做常規活動，是否有研究倫理爭議？", "a_en": "The control group receives time-matched routine facility activities (such as music listening, arts, or standard institutional social recreation), so they are not deprived of social engagement or care. Both groups maintain standard nursing care. If the app proves superior, the control group will be offered the app intervention in a subsequent crossover phase.", "a_zh": "對照組並非被剝奪活動，而是接受「相同時長（45分鐘、每週2次）的機構常規社交活動」（如音樂聆聽、美勞或日常文康）。兩組均維持原有的醫療照護。若 12 週後證實 App 介入組效益顯著，對照組長者將在後續交叉等待期（Waitlist crossover）獲得相同的 App 課程。", "note": "說明對照組有等時常規活動，符合赫爾辛基宣言與 IRB 倫理要求。", "related_step": 5}, {"id": "q15", "cat": "method", "cat_zh": "試驗與統計", "q_en": "How do you distinguish implementation outcomes from resident clinical outcomes?", "q_zh": "你們如何區分「實施指標（Implementation）」與「長者臨床指標（Resident-level）」？", "a_en": "Following implementation science frameworks (like Proctor's model), implementation outcomes measure service viability: attendance, session completion, fidelity checklists, staff usability (SUS), and adverse events. Resident-level outcomes measure clinical response: SPMSQ, FAB, GDS-SF15, and CMAI. A digital tool must prove feasible in staff workflow before clinical gains can be sustained.", "a_zh": "依據實施科學（Implementation Science）框架，實施指標評估的是「服務能否在現場活下去」：包含出席率、活動完成度、引導忠誠度檢核表、照護員易用度問卷（SUS）與不良事件通報。而長者臨床指標評估的是認知與情緒改善（SPMSQ, FAB, GDS, CMAI）。數位工具必須先在照護流程中可行，臨床效益才具備永續價值。", "note": "點出實施科學雙軌評估架構，展現成熟的研究方法視野。", "related_step": 5}]}, {"id": 6, "step_num": 6, "title_zh": "6. 研究結論與結尾互動", "title_en": "Conclusion & Closing", "timing": "3:35 - 4:05", "word_count": 40, "target_area": "Section IV: CONTRIBUTIONS & CONCLUSION", "image": "poster_assets/step6_conclusion.jpg", "hotspot": {"top": "82%", "left": "28%", "width": "72%", "height": "18%"}, "script_en": ["Overall, our goal is to bring traditional cognitive stimulation into everyday long-term care in a practical, culturally relevant way.", "That's a quick overview!", "Is there anything you'd like to ask?"], "script_zh": "整體而言，我們的目標是透過一種實用且符合在地文化的方式，將傳統認知刺激活動融入長期照護機構的日常照護工作中。以上就是我們研究的簡單介紹！請問你有任何想進一步了解的地方嗎？", "cue_zh": "有力收尾，總結貢獻（實用性＋文化相關性＋低負擔），親切邀請現場提問與互動。", "key_points": ["研究核心貢獻：將紙本學習療法轉化為機構可永續運作的數位健康服務", "設計哲學：以照護現場工作流為中心，兼顧文化契合度與低負擔", "後續規劃：機構試驗驗證實施成效，並做為未來個別化與擴展之基礎", "計畫核准與資助：陽明交大人體試驗委員會 NYCU112062AF，嚴慶齡醫學基金會"], "qa": [{"id": "q16", "cat": "adoption", "cat_zh": "政策與推廣", "q_en": "What is the primary contribution of this work to the IEEE HealthCom conference?", "q_zh": "本篇論文對 IEEE HealthCom 研討會的核心學術貢獻是什麼？", "a_en": "Our primary contribution is bridging the translational gap between digital health technology and clinical workflow in dementia care. Rather than adding administrative burden, our app co-designs reusable group modules, automated session documentation, and cultural adaptation to enable sustainable eHealth deployment in dementia care.", "a_zh": "核心貢獻在於跨越數位健康技術與臨床照護工作流之間的轉譯鴻溝。我們不單純開發軟體功能，而是透過工作流協同設計（Workflow-aware co-design），將小團體活動引導、自動化歷程紀錄與在地化文化教材三者合一，為長期照護機構打造可永續落地的數位健康服務模式。", "note": "點題「Workflow-Aware eHealth Service」——這正是 HealthCom 研討會最看重的落地實用價值。", "related_step": 6}, {"id": "q17", "cat": "adoption", "cat_zh": "政策與推廣", "q_en": "What is the economic cost and facility willingness to adopt this system?", "q_zh": "機構導入的經濟成本高嗎？長照機構會有意願採用嗎？", "a_en": "Because the app runs on consumer tablets and standard TVs without specialized equipment, upfront capital expenditure is practically zero. Furthermore, Taiwan's Long-Term Care 2.0 policy prioritizes non-pharmacological dementia interventions. By saving staff prep time and automatically generating compliance documentation, facilities have strong operational incentives to adopt it.", "a_zh": "由於系統完全執行於現有平板與電視，前期硬體投資幾乎為零。此外，臺灣長照 2.0 政策將非藥物認知促進列為評鑑重要項目。App 能有效節省照護員備課時數，且後台一鍵匯出活動紀錄與出席報表，能直接用於機構評鑑與活動稽核，對機構經營者具有極高的導入誘因。", "note": "結合臺灣長照 2.0 政策與評鑑痛點，展示商業與政策推廣可行性。", "related_step": 6}, {"id": "q18", "cat": "adoption", "cat_zh": "政策與推廣", "q_en": "Can this service model be extended beyond residential facilities, such as daycare or home care?", "q_zh": "這個服務模式未來能推廣到日間照顧中心或居家長照嗎？", "a_en": "Yes. Daycare centers share the same small-group recreational structure and can adopt the app directly. For home care, family caregivers or visiting home aides can use a simplified one-on-one module. Our upcoming development phase will evaluate adaptive pacing for home settings once the institutional trial is completed.", "a_zh": "非常適合。日間照顧中心（日照中心）的日間課表型態與本系統小團體架構完全契合，可無縫導入。對於居家長照，家屬或居家照服員則可採用單人簡化模式進行一對一認知互動。待機構臨床試驗完成後，延伸至日照與社區長照據點是我們最重要的擴展方向。", "note": "展示從住宿型機構向日照、社區與居家長照延伸的完整藍圖。", "related_step": 6}]}];
+    const ALL_QA = [{"id": "q1", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "Have you conducted the clinical trial yet? What are your resident outcome data?", "q_zh": "臨床試驗做過了嗎？有沒有長者改善的數據？", "a_en": "The software development and service architecture are completed, but the facility-based clinical evaluation has not yet been conducted. In this paper, we report the workflow-aware service design, implementation principles, and the prospective 12-week evaluation protocol under IRB approval NYCU112062AF.", "a_zh": "軟體系統開發與服務架構已全部完成，但機構實地臨床評估尚未進行。本篇論文核心報告的是符合照護工作流的服務設計、實施架構，以及在陽明交大人體試驗委員會（NYCU112062AF）核准下的 12 週前瞻評估研究設計。", "note": "⚠️ 核心誠實原則：千萬不能捏造臨床療效或宣稱「已經證明有效」。誠實說明本篇是報告「系統開發、服務設計與前瞻臨床評估研究計畫」。", "related_step": 5}, {"id": "q2", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "What is Learning Therapy, and how does your app differ from commercial tablet brain games?", "q_zh": "什麼是學習療法（Learning Therapy）？它跟市面上平板益智遊戲有何不同？", "a_en": "Learning Therapy was pioneered by Dr. Ryuta Kawashima in Japan, using structured oral reading and basic arithmetic to stimulate frontal brain regions. Unlike individual entertainment apps, our service is workflow-aware: it is built specifically for facility caregivers to lead small groups on a shared screen, eliminating manual worksheet preparation and isolated tablet use.", "a_zh": "學習療法源自日本東北大學川島隆太教授的研究，透過基礎數學計算與大聲朗讀來活化大腦前額葉。市售商業益智遊戲多偏向個人娛樂且需要長者自行操作，而我們的服務是工作流導向（workflow-aware）：專為機構照護員設計，帶領小團體在共用大螢幕上互動，解決紙本備課與長者獨自玩平板的疏離感。", "note": "強調不是把長者丟給平板玩，而是由照護人員主導的團體學習療法工作流整合。", "related_step": 2}, {"id": "q3", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "Why choose small group activities on a shared display instead of individual tablet use?", "q_zh": "為什麼堅持「小團體共用大螢幕」，而不是讓長者一人一台平板？", "a_en": "In institutional dementia care, many residents have sensory, motor, or visual limitations that make independent tablet interaction frustrating. A shared display guided by staff fosters interpersonal social interactions, prevents isolation, and allows the caregiver to pace the session safely.", "a_zh": "在長照機構中，許多失智長者伴隨手部顫抖、視力退化或觸控理解困難，個別操作平板常引發挫折感。透過照護員帶領共用大螢幕，不僅降低操作門檻，更能營造團體同儕互動氛圍，減少孤立感，並讓照護人員隨時掌握活動節奏與長者情緒。", "note": "點出機構長者的身體限制（視力、手部精細動作）與小團體同儕社交的心理正面效益。", "related_step": 4}, {"id": "q4", "cat": "clinical", "cat_zh": "臨床與機制", "q_en": "What stages of dementia are eligible for this study, and can severe dementia patients participate?", "q_zh": "這項研究收案的失智症程度為何？重度失智長者也能參與嗎？", "a_en": "We target older adults with mild-to-moderate dementia (e.g., SPMSQ 3 to 7 errors, or CDR 1 to 2) who retain sufficient visual and auditory ability to engage with a shared display. Residents with severe dementia (CDR 3) or acute psychiatric instability are excluded, as structured verbal and arithmetic tasks require baseline receptive and expressive capacity.", "a_zh": "我們收案對象主要針對輕度至中度失智長者（例如 SPMSQ 錯 3–7 題，或 CDR 1–2 分），且具備基本視力與聽力以觀看共用螢幕。重度失智長者（CDR 3）或合併急性精神行為問題者會予以排除，因為結構化的朗讀與計算任務需要最基本的語言理解與表達功能。", "note": "明確認定適用邊界（輕中度為主），展示對長照臨床實務的精準了解。", "related_step": 1}, {"id": "q5", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "What specific Taiwanese cultural localization was incorporated into the modules?", "q_zh": "你們強調的「臺灣在地化文化內容」具體包含哪些教材？", "a_en": "Translated foreign materials often lack personal relevance for Taiwanese seniors. We incorporated culturally familiar proverbs, traditional Taiwanese holidays, local landmarks, nostalgic life experiences, and colloquial phrases into our reading and verbal fluency modules, which stimulates autobiographical memory and spontaneous participation.", "a_zh": "外國引進的教材常因文化隔閡無法引起臺灣長者共鳴。我們特別挑選了本土俗諺、傳統節慶（如元宵猜燈謎、端午、中秋）、在地地名景點，以及長者年輕時熟悉的鄉土生活經驗，融入朗讀與語意流暢度模組，能有效誘發自傳式長期記憶（autobiographical memory），大幅提高主動開口參與的意願。", "note": "說明文化親和力能觸發長者的自傳式記憶，是提升參與率的認知神經學關鍵。", "related_step": 3}, {"id": "q6", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "How much training do frontline care staff need to learn and operate this app?", "q_zh": "機構照護人員需要培訓多久才能上手操作？會不會增加排班負擔？", "a_en": "The system follows a zero-configuration design ethos. Frontline care staff need only a single 30-minute orientation session. The interface features large touch targets, preset daily activity modules, and automated one-touch attendance logging, significantly reducing material preparation time compared to paper worksheets.", "a_zh": "系統秉持「零複雜設定」原則，照護人員僅需一次 30 分鐘的實機教學即可上手。介面採用大按鈕設計、預設好每日活動模組，並支援一鍵點名與歷程儲存。相較於傳統需影印、剪裁紙本教材與手寫記錄，App 實際上大幅縮短了備課時間，反而減輕照護排班負擔。", "note": "強調 workflow-aware：不增加工作量，反而省下繁瑣紙本作業時間。", "related_step": 4}, {"id": "q7", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "How do caregivers handle resident agitation or refusal during group sessions?", "q_zh": "若長者在團體活動中情緒躁動或抗拒參與，照護員如何處理？", "a_en": "Facilitators can pause, slow down pacing, or change modules with a single tap. The protocol includes an agitation event log integrated with CMAI monitoring. If a resident exhibits persistent distress, the caregiver gently guides them to a quiet rest area with a secondary staff member, ensuring emotional safety without interrupting the group.", "a_zh": "照護員可一鍵暫停、減緩速度或切換至輕鬆模組。試驗標準作業程序（SOP）中整合了躁動事件記錄（與 CMAI 量表連動）。若長者出現持續排斥或情緒波動，會由協同工作人員溫和帶離至安靜區休息，在確保長者情緒安全的同時，維持團體其他長者的活動進行。", "note": "展示對失智症情緒行為（BPSD）有完善的臨床處置 SOP。", "related_step": 4}, {"id": "q8", "cat": "workflow", "cat_zh": "服務與工作流", "q_en": "Why 45 minutes twice weekly? What is the clinical rationale for this dosing?", "q_zh": "為什麼設定為「每週 2 次、每次 45 分鐘」？有何臨床依據？", "a_en": "This schedule aligns with clinical evidence from Cognitive Stimulation Therapy (CST) and original Learning Therapy protocols. Dementia patients typically experience attention fatigue after 30 to 45 minutes. A twice-weekly frequency maintains cognitive engagement while fitting smoothly into institutional activity calendars without displacing physical rehabilitation or dining.", "a_zh": "此劑量設計基於國際認知刺激治療（CST）與學習療法的實證研究。失智長者的專注力在持續 30–45 分鐘後常會下降；每週 2 次的頻率既能維持穩定的認知活化刺激，又能完美融入長照機構每週常規課表，不排擠復健治療與生活起居時間。", "note": "展示劑量設定背後的生理專注力極限與機構作息排程考量。", "related_step": 5}, {"id": "q9", "cat": "tech", "cat_zh": "技術與資安", "q_en": "How does the system ensure resident privacy and institutional data security?", "q_zh": "長者的隱私與機構資料安全如何控管？符合法規嗎？", "a_en": "All resident records are pseudonymized with de-identified study IDs and role-restricted permissions. No personally identifiable medical records are cached on the frontend presentation display. Data transfer is encrypted via TLS 1.3, complying with institutional data governance and IRB ethics approval NYCU112062AF.", "a_zh": "所有長者歷程紀錄皆以去識別化研究編號（De-identified IDs）代號化管理，並具備分層權限控管。前端投影螢幕上絕不留存長者身分證字號或病歷隱私資料。系統所有傳輸均採 TLS 1.3 加密，完全符合臺灣個人資料保護法與 NYCU112062AF 人體試驗委員會規範。", "note": "強調去識別化、角色權限控管 (RBAC) 與通過 IRB 倫理審查。", "related_step": 4}, {"id": "q10", "cat": "tech", "cat_zh": "技術與資安", "q_en": "Can the app operate if facility Wi-Fi is unstable or offline?", "q_zh": "機構網路若收訊不良或斷線，系統還能正常運作嗎？", "a_en": "Yes. The Smart Learning App is architected as a Progressive Web Application (PWA) with Service Worker caching. Once modules are loaded, the entire group activity can run completely offline on local tablets or TVs. Session logs are cached locally in encrypted browser storage and automatically sync to the server once connectivity resumes.", "a_zh": "完全可以。系統採用 Progressive Web Application (PWA) 架構並配備 Service Worker 離線快取機制。活動模組下載後，即使會場或機構完全無網路，仍可在本地平板或智慧電視離線流暢運作。活動紀錄會先加密存於本機，待網路恢復時自動同步回傳後台。", "note": "強調離線運作能力 (PWA)，切中長照機構經常 Wi-Fi 覆蓋不均的痛點。", "related_step": 4}, {"id": "q11", "cat": "tech", "cat_zh": "技術與資安", "q_en": "What is the technical stack and hardware requirement for deployment?", "q_zh": "系統架構技術棧為何？需要採購昂貴的特殊硬體嗎？", "a_en": "The system requires no proprietary hardware. Frontend uses responsive HTML5, modern CSS3, and JavaScript optimized for 10-inch Android/iOS tablets and 55-inch+ facility TV screens via HDMI, Chromecast, or AirPlay. The backend runs on a lightweight RESTful API with relational database architecture, keeping deployment costs minimal.", "a_zh": "無需採購任何昂貴的特製硬體。前端為響應式 HTML5/CSS3/JavaScript，可在機構現有的 10 吋 iPad 或 Android 平板上執行，並可透過 HDMI 線、Chromecast 或 AirPlay 投放至機構大廳現有的 55 吋以上電視螢幕。後端採用輕量 RESTful API 與關聯式資料庫，極大化降低機構採購門檻。", "note": "強調相容現有設備，不需額外高昂硬體投資。", "related_step": 3}, {"id": "q12", "cat": "method", "cat_zh": "試驗與統計", "q_en": "Why choose SPMSQ and FAB instead of MMSE or MoCA as clinical endpoints?", "q_zh": "為何選擇 SPMSQ 與 FAB，而不是最常見的 MMSE 或 MoCA？", "a_en": "SPMSQ is a 10-item screening tool widely validated in Taiwanese long-term care settings that requires no paper drawing or writing, reducing testing anxiety and fatigue for frail residents. The Frontal Assessment Battery (FAB) specifically assesses executive function and cognitive flexibility, which directly maps onto the prefrontal activation mechanism of Learning Therapy.", "a_zh": "SPMSQ 在臺灣長照評鑑與臨床照護中已被廣泛採納，共 10 題口語問答，不需長者持筆書寫繪畫，能大幅減少衰弱長者的測驗焦慮與疲憊感。而額葉評估量表（FAB）專門評估執行功能、概念形成與抑制控制，恰好對應學習療法活化前額葉腦區的神經機制，最具敏感度。", "note": "展示對測驗負擔（SPMSQ 簡短免持筆）與機制對齊（FAB 測額葉）的深層考量。", "related_step": 5}, {"id": "q13", "cat": "method", "cat_zh": "試驗與統計", "q_en": "What statistical models will you use, and why not simple paired t-tests?", "q_zh": "12 週試驗預計採用什麼統計模型分析？為什麼不用成對 t 檢定？", "a_en": "We will evaluate group-by-time interaction effects using baseline-adjusted Linear Mixed-Effects Models (LMM) or Generalized Estimating Equations (GEE). These models handle correlated repeated measures over time and accommodate small-group clustering and missing data without discarding incomplete cases, which simple t-tests cannot achieve.", "a_zh": "我們將使用基準線校正之線性混合效應模型（LMM）或廣義估計方程式（GEE）來檢定「組別與時間的交互作用（group-by-time interaction）」。由於長者在 12 週內有重複測量，且長者嵌套於活動小組內，LMM 與 GEE 能妥善處理個體內相依性與群體聚集效應，並容納部分缺漏值，遠比傳統 t 檢定嚴謹可靠。", "note": "展現對長期追蹤 (longitudinal repeated measures) 與群體聚集效應 (clustering) 的統計嚴謹度。", "related_step": 5}, {"id": "q14", "cat": "method", "cat_zh": "試驗與統計", "q_en": "How do you ethically manage the control arm? Are they deprived of activities?", "q_zh": "對照組長者在 12 週內只做常規活動，是否有研究倫理爭議？", "a_en": "The control group receives time-matched routine facility activities (such as music listening, arts, or standard institutional social recreation), so they are not deprived of social engagement or care. Both groups maintain standard nursing care. If the app proves superior, the control group will be offered the app intervention in a subsequent crossover phase.", "a_zh": "對照組並非被剝奪活動，而是接受「相同時長（45分鐘、每週2次）的機構常規社交活動」（如音樂聆聽、美勞或日常文康）。兩組均維持原有的醫療照護。若 12 週後證實 App 介入組效益顯著，對照組長者將在後續交叉等待期（Waitlist crossover）獲得相同的 App 課程。", "note": "說明對照組有等時常規活動，符合赫爾辛基宣言與 IRB 倫理要求。", "related_step": 5}, {"id": "q15", "cat": "method", "cat_zh": "試驗與統計", "q_en": "How do you distinguish implementation outcomes from resident clinical outcomes?", "q_zh": "你們如何區分「實施指標（Implementation）」與「長者臨床指標（Resident-level）」？", "a_en": "Following implementation science frameworks (like Proctor's model), implementation outcomes measure service viability: attendance, session completion, fidelity checklists, staff usability (SUS), and adverse events. Resident-level outcomes measure clinical response: SPMSQ, FAB, GDS-SF15, and CMAI. A digital tool must prove feasible in staff workflow before clinical gains can be sustained.", "a_zh": "依據實施科學（Implementation Science）框架，實施指標評估的是「服務能否在現場活下去」：包含出席率、活動完成度、引導忠誠度檢核表、照護員易用度問卷（SUS）與不良事件通報。而長者臨床指標評估的是認知與情緒改善（SPMSQ, FAB, GDS, CMAI）。數位工具必須先在照護流程中可行，臨床效益才具備永續價值。", "note": "點出實施科學雙軌評估架構，展現成熟的研究方法視野。", "related_step": 5}, {"id": "q16", "cat": "adoption", "cat_zh": "政策與推廣", "q_en": "What is the primary contribution of this work to the IEEE HealthCom conference?", "q_zh": "本篇論文對 IEEE HealthCom 研討會的核心學術貢獻是什麼？", "a_en": "Our primary contribution is bridging the translational gap between digital health technology and clinical workflow in dementia care. Rather than adding administrative burden, our app co-designs reusable group modules, automated session documentation, and cultural adaptation to enable sustainable eHealth deployment in dementia care.", "a_zh": "核心貢獻在於跨越數位健康技術與臨床照護工作流之間的轉譯鴻溝。我們不單純開發軟體功能，而是透過工作流協同設計（Workflow-aware co-design），將小團體活動引導、自動化歷程紀錄與在地化文化教材三者合一，為長期照護機構打造可永續落地的數位健康服務模式。", "note": "點題「Workflow-Aware eHealth Service」——這正是 HealthCom 研討會最看重的落地實用價值。", "related_step": 6}, {"id": "q17", "cat": "adoption", "cat_zh": "政策與推廣", "q_en": "What is the economic cost and facility willingness to adopt this system?", "q_zh": "機構導入的經濟成本高嗎？長照機構會有意願採用嗎？", "a_en": "Because the app runs on consumer tablets and standard TVs without specialized equipment, upfront capital expenditure is practically zero. Furthermore, Taiwan's Long-Term Care 2.0 policy prioritizes non-pharmacological dementia interventions. By saving staff prep time and automatically generating compliance documentation, facilities have strong operational incentives to adopt it.", "a_zh": "由於系統完全執行於現有平板與電視，前期硬體投資幾乎為零。此外，臺灣長照 2.0 政策將非藥物認知促進列為評鑑重要項目。App 能有效節省照護員備課時數，且後台一鍵匯出活動紀錄與出席報表，能直接用於機構評鑑與活動稽核，對機構經營者具有極高的導入誘因。", "note": "結合臺灣長照 2.0 政策與評鑑痛點，展示商業與政策推廣可行性。", "related_step": 6}, {"id": "q18", "cat": "adoption", "cat_zh": "政策與推廣", "q_en": "Can this service model be extended beyond residential facilities, such as daycare or home care?", "q_zh": "這個服務模式未來能推廣到日間照顧中心或居家長照嗎？", "a_en": "Yes. Daycare centers share the same small-group recreational structure and can adopt the app directly. For home care, family caregivers or visiting home aides can use a simplified one-on-one module. Our upcoming development phase will evaluate adaptive pacing for home settings once the institutional trial is completed.", "a_zh": "非常適合。日間照顧中心（日照中心）的日間課表型態與本系統小團體架構完全契合，可無縫導入。對於居家長照，家屬或居家照服員則可採用單人簡化模式進行一對一認知互動。待機構臨床試驗完成後，延伸至日照與社區長照據點是我們最重要的擴展方向。", "note": "展示從住宿型機構向日照、社區與居家長照延伸的完整藍圖。", "related_step": 6}];
 
     let currentStepIdx = 0;
-    let scriptMode = 'bilingual'; // 'bilingual', 'en', 'zh'
-    let viewMode = 'focus'; // 'focus', 'full'
+    let scriptMode = 'bilingual';
+    let viewMode = 'focus';
     let posterZoom = 1.0;
+    let selectedQACat = 'all';
 
     // Timer variables
     let timerSeconds = 0;
@@ -954,6 +951,7 @@
 
     function init() {
       renderStep(currentStepIdx);
+      renderModalQA();
       setupKeyboard();
     }
 
@@ -961,27 +959,22 @@
       currentStepIdx = idx;
       const step = STEPS[idx];
 
-      // Update navbar step badge
       document.getElementById('badge-step-tag').textContent = `Step ${step.step_num} / ${STEPS.length}`;
       document.getElementById('timing-tag').textContent = step.timing;
       document.getElementById('words-tag').textContent = step.word_count;
 
-      // Update step pills
       document.querySelectorAll('.step-pill').forEach((pill, i) => {
         pill.classList.toggle('active', i === idx);
       });
 
-      // Update hotspots on full poster
       document.querySelectorAll('.hotspot-box').forEach((box, i) => {
         box.classList.toggle('active', i === idx);
       });
 
-      // Update Focused image & label
       const focusedImg = document.getElementById('focused-img');
       focusedImg.src = step.image;
       document.getElementById('focused-section-label').textContent = step.target_area;
 
-      // Render Drawer Content
       const drawer = document.getElementById('drawer-content');
       let html = '';
 
@@ -1038,16 +1031,21 @@
         </div>
       `;
 
-      // Step QA
+      // Step QA Accordion
       if (step.qa && step.qa.length > 0) {
         html += `
           <div class="qa-accordion">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--accent-cyan);margin-top:4px;">🛡️ 本段相關 Q&A 預防提問 (${step.qa.length} 題)</div>
             ${step.qa.map(item => `
               <details class="qa-details" open>
-                <summary class="qa-summary">❓ ${item.q}</summary>
+                <summary class="qa-summary">
+                  <span class="qa-cat-badge">${item.cat_zh}</span>
+                  <span>${item.q_zh}</span>
+                </summary>
                 <div class="qa-body">
-                  <div class="qa-answer"><strong>💡 建議回答:</strong> ${item.a}</div>
-                  <div class="qa-note">📝 <strong>提示：</strong>${item.note}</div>
+                  <div class="qa-answer"><strong>💡 建議英文回答:</strong><br>${item.a_en}</div>
+                  <div class="qa-answer-zh"><strong>🀄 中文意涵:</strong> ${item.a_zh}</div>
+                  <div class="qa-note">📝 <strong>應答心法：</strong>${item.note}</div>
                 </div>
               </details>
             `).join('')}
@@ -1157,7 +1155,7 @@
       const mins = Math.floor(timerSeconds / 60);
       const secs = timerSeconds % 60;
       timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      if (timerSeconds >= 180) { // 3 mins warning
+      if (timerSeconds >= 180) {
         timerBtn.classList.add('timer-warn');
       } else {
         timerBtn.classList.remove('timer-warn');
@@ -1170,9 +1168,65 @@
       resetTimer();
     });
 
+    // Render Global QA in Modal
+    function renderModalQA() {
+      const listEl = document.getElementById('modal-qa-list');
+      const keyword = (document.getElementById('qa-search') ? document.getElementById('qa-search').value.toLowerCase().trim() : '');
+
+      let filtered = ALL_QA.filter(item => {
+        const matchesCat = (selectedQACat === 'all' || item.cat === selectedQACat);
+        if (!matchesCat) return false;
+        if (!keyword) return true;
+        return (
+          item.q_en.toLowerCase().includes(keyword) ||
+          item.q_zh.includes(keyword) ||
+          item.a_en.toLowerCase().includes(keyword) ||
+          item.a_zh.includes(keyword) ||
+          item.note.includes(keyword)
+        );
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);">無相符問題，請嘗試搜尋其他關鍵字。</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map((item, idx) => `
+        <details class="qa-details" ${idx < 3 ? 'open' : ''}>
+          <summary class="qa-summary">
+            <span class="qa-cat-badge">${item.cat_zh}</span>
+            <span><strong>${item.id.toUpperCase()}.</strong> ${item.q_zh}</span>
+          </summary>
+          <div class="qa-body">
+            <div style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">"${item.q_en}"</div>
+            <div class="qa-answer"><strong>💡 建議英文回答:</strong><br>${item.a_en}</div>
+            <div class="qa-answer-zh"><strong>🀄 中文解析:</strong> ${item.a_zh}</div>
+            <div class="qa-note">📝 <strong>應答心法與提醒：</strong>${item.note}</div>
+          </div>
+        </details>
+      `).join('');
+    }
+
+    function filterQA() {
+      renderModalQA();
+    }
+
+    function filterQACat(cat, el) {
+      selectedQACat = cat;
+      document.querySelectorAll('.qa-cat-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      renderModalQA();
+    }
+
     // Modals
     function openModal(id) {
       document.getElementById(id).classList.add('open');
+      if (id === 'qa-modal') {
+        setTimeout(() => {
+          const inp = document.getElementById('qa-search');
+          if (inp) inp.focus();
+        }, 100);
+      }
     }
     function closeModal(id) {
       document.getElementById(id).classList.remove('open');
