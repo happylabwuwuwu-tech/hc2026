@@ -1,5 +1,17 @@
-﻿const CACHE_NAME = 'hc2026-presenter-v3';
-const ASSETS = ['./', './index.html', './HealthCom_presenter.html'];
+const CACHE_NAME = 'hc2026-presenter-v4';
+const ASSETS = [
+  './',
+  './index.html',
+  './HealthCom_presenter.html',
+  './poster.html',
+  './poster_assets/poster_2400.jpg',
+  './poster_assets/step1_intro.jpg',
+  './poster_assets/step2_background.jpg',
+  './poster_assets/step3_features.jpg',
+  './poster_assets/step4_workflow.jpg',
+  './poster_assets/step5_evaluation.jpg',
+  './poster_assets/step6_conclusion.jpg'
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

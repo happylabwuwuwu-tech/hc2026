@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>IEEE HealthCom 2026 · Smart Learning App 海報報告講稿助手</title>
+  <meta name="description" content="IEEE HealthCom 2026 Poster Presenter - Smart Learning App for Cognitive Stimulation in Long-Term Care">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #273549;
+      --border-subtle: #334155;
+      --border-accent: #38bdf8;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-cyan: #38bdf8;
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      --accent-indigo: #818cf8;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    .navbar {
+      height: 60px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      position: relative;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+    .nav-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .nav-timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #182234;
+      border: 1px solid var(--border-subtle);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+    .nav-timer-pill:hover { border-color: var(--accent-emerald); }
+    .nav-timer-pill.timer-warn { color: var(--accent-amber); animation: pulse 1s infinite; }
+    .nav-timer-pill.timer-alert { color: var(--accent-rose); animation: pulse 0.5s infinite; }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-nav {
+      min-height: 38px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .btn-nav:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-cyan);
+    }
+    .btn-nav.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    .btn-step-nav {
+      min-height: 38px;
+      min-width: 38px;
+      padding: 0 10px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Main Container Layout */
+    .main-container {
+      display: flex;
+      height: calc(100vh - 60px);
+      height: calc(100dvh - 60px);
+      width: 100%;
+      position: relative;
+    }
+
+    /* Left Pane: Speaker Drawer / Teleprompter */
+    .drawer {
+      flex: 0 0 45%;
+      max-width: 45%;
+      height: 100%;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 10;
+    }
+    .drawer-header {
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .step-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .step-pills::-webkit-scrollbar { display: none; }
+    .step-pill {
+      flex: 1;
+      min-width: 32px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .step-pill:hover { border-color: var(--accent-cyan); color: var(--text-main); }
+    .step-pill.active {
+      background: var(--accent-cyan);
+      color: #090d16;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .step-info-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .step-meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .step-meta-badge b { color: var(--accent-cyan); }
+    .script-mode-selector {
+      display: flex;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .mode-tab {
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+    .mode-tab:not(:last-child) { border-right: 1px solid var(--border-subtle); }
+    .mode-tab.active {
+      background: rgba(56, 189, 248, 0.25);
+      color: var(--accent-cyan);
+    }
+
+    .drawer-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Script Blocks */
+    .section-title-wrap {
+      margin-bottom: 4px;
+    }
+    .section-title-zh {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .section-title-en {
+      font-size: 0.95rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .script-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .script-header-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .script-sentence {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+    .script-sentence:hover {
+      background: rgba(255,255,255,0.04);
+      color: #ffffff;
+    }
+    .script-sentence.highlighted {
+      background: rgba(56, 189, 248, 0.15);
+      border-left-color: var(--accent-cyan);
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .translation-box {
+      background: rgba(30, 41, 59, 0.5);
+      border-left: 3px solid var(--accent-indigo);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.65;
+    }
+    .cue-box {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      color: #fde68a;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    /* Key Points Card */
+    .key-points-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+    .key-points-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .key-points-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .key-points-list li {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .key-points-list li::before {
+      content: "•";
+      color: var(--accent-emerald);
+      font-weight: bold;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    /* Collapsible QA */
+    .qa-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .qa-details {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+    .qa-details[open] { border-color: rgba(56, 189, 248, 0.4); }
+    .qa-summary {
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(30, 41, 59, 0.7);
+    }
+    .qa-summary:hover { background: var(--bg-card-hover); }
+    .qa-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .qa-answer {
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+    .qa-note {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 8px 10px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    /* Right Pane: Poster Viewport */
+    .viewport {
+      flex: 0 0 55%;
+      max-width: 55%;
+      height: 100%;
+      background: #020617;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .viewport-toolbar {
+      height: 48px;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 20;
+    }
+    .view-mode-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-view-mode {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-view-mode.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    .zoom-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-zoom {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-zoom:hover { background: var(--bg-card-hover); }
+
+    .viewport-canvas {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 48px);
+      position: relative;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+      padding: 12px;
+    }
+
+    /* Focused Section Graphic */
+    .focused-view {
+      max-width: 100%;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .focused-img {
+      max-width: 100%;
+      max-height: calc(100vh - 150px);
+      object-fit: contain;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.3s ease;
+    }
+    .focused-label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: var(--accent-cyan);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    /* Full Poster View with Hotspots */
+    .full-poster-wrapper {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      transform-origin: center center;
+      transition: transform 0.2s ease-out;
+    }
+    .full-poster-img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-subtle);
+    }
+    .hotspot-box {
+      position: absolute;
+      border: 2px dashed rgba(56, 189, 248, 0.5);
+      background: rgba(56, 189, 248, 0.08);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 4px;
+    }
+    .hotspot-box:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+    }
+    .hotspot-box.active {
+      border: 3px solid var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+      animation: hotspot-glow 2s infinite;
+    }
+    .hotspot-badge {
+      background: var(--accent-cyan);
+      color: #090d16;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    @keyframes hotspot-glow {
+      0%, 100% { border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+      50% { border-color: #ffffff; box-shadow: 0 0 25px rgba(56, 189, 248, 0.8); }
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      max-width: 720px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: modal-pop 0.2s ease-out;
+    }
+    @keyframes modal-pop {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-size: 1.15rem; font-weight: 700; color: var(--text-main); }
+    .btn-close {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Numbers Table */
+    .quick-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .quick-table th, .quick-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .quick-table th {
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+    .quick-table td:first-child { font-weight: 600; color: #f1f5f9; }
+    .quick-table td:last-child { font-family: var(--font-mono); color: var(--accent-emerald); }
+
+    /* Mobile Responsive Rules (<= 900px) */
+    @media (max-width: 900px) {
+      .navbar {
+        height: auto;
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .nav-top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+      .nav-controls {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        width: 100%;
+      }
+      .btn-nav {
+        min-height: 44px;
+        padding: 6px 4px;
+        font-size: 0.78rem;
+        justify-content: center;
+        text-align: center;
+      }
+
+      /* CRUCIAL MOBILE LAYOUT: DRAWER ON TOP (order: 1), VIEWPORT ON BOTTOM (order: 2) */
+      .main-container {
+        flex-direction: column;
+        height: calc(100vh - 105px);
+        height: calc(100dvh - 105px);
+      }
+      .drawer {
+        order: 1;
+        flex: 0 0 52%;
+        max-width: 100%;
+        height: 52%;
+        border-right: none;
+        border-bottom: 2px solid var(--border-subtle);
+      }
+      .viewport {
+        order: 2;
+        flex: 0 0 48%;
+        max-width: 100%;
+        height: 48%;
+      }
+      .drawer-header { padding: 8px 12px; gap: 6px; }
+      .drawer-content { padding: 12px; gap: 10px; }
+      .script-sentence { font-size: 1.05rem; padding: 4px 6px; }
+      .translation-box { font-size: 0.9rem; padding: 10px 12px; }
+      .step-pill { min-width: 36px; height: 38px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="nav-top-row">
+      <div class="nav-brand">
+        <span>🩺 IEEE HealthCom '26</span>
+        <span class="nav-badge" id="badge-step-tag">Step 1 / 6</span>
+      </div>
+      <div class="nav-timer-pill" id="btn-timer" title="點擊切換計時/暫停，右鍵或長按重設">
+        ⏱️ <span id="timer-display">00:00</span>
+      </div>
+    </div>
+    <div class="nav-controls">
+      <button class="btn-nav btn-step-nav" id="btn-prev" onclick="prevStep()">◀ 上一段</button>
+      <button class="btn-nav btn-step-nav" id="btn-next" onclick="nextStep()">下一段 ▶</button>
+      <button class="btn-nav" onclick="openModal('num-modal')">🔢 數字速查</button>
+      <button class="btn-nav" onclick="openModal('qa-modal')">🛡️ 必答題庫</button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- Drawer / Teleprompter (TOP on mobile) -->
+    <aside class="drawer">
+      <div class="drawer-header">
+        <div class="step-pills">
+          <div class="step-pill active" onclick="goToStep(1)">1</div>
+          <div class="step-pill" onclick="goToStep(2)">2</div>
+          <div class="step-pill" onclick="goToStep(3)">3</div>
+          <div class="step-pill" onclick="goToStep(4)">4</div>
+          <div class="step-pill" onclick="goToStep(5)">5</div>
+          <div class="step-pill" onclick="goToStep(6)">6</div>
+        </div>
+        <div class="step-info-bar">
+          <div class="step-meta-badge" id="step-meta">
+            <span>⏱ <b id="timing-tag">0:00 - 0:35</b></span>
+            <span>·</span>
+            <span><b id="words-tag">45</b> words</span>
+          </div>
+          <div class="script-mode-selector">
+            <button class="mode-tab active" id="tab-bilingual" onclick="setScriptMode('bilingual')">雙語</button>
+            <button class="mode-tab" id="tab-en" onclick="setScriptMode('en')">英文</button>
+            <button class="mode-tab" id="tab-zh" onclick="setScriptMode('zh')">提示</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-content" id="drawer-content">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </aside>
+
+    <!-- Viewport / Poster Visual (BOTTOM on mobile) -->
+    <section class="viewport">
+      <div class="viewport-toolbar">
+        <div class="view-mode-tabs">
+          <button class="btn-view-mode active" id="btn-mode-focus" onclick="setViewMode('focus')">🔍 區塊特寫</button>
+          <button class="btn-view-mode" id="btn-mode-full" onclick="setViewMode('full')">🗺️ 完整全圖</button>
+        </div>
+        <div class="zoom-controls">
+          <button class="btn-zoom" onclick="zoomPoster(-0.15)" title="縮小">-</button>
+          <button class="btn-zoom" onclick="resetZoomPoster()" title="重設縮放">⟲</button>
+          <button class="btn-zoom" onclick="zoomPoster(0.15)" title="放大">+</button>
+        </div>
+      </div>
+
+      <div class="viewport-canvas" id="viewport-canvas">
+        <!-- Focused View -->
+        <div class="focused-view" id="focused-view-container">
+          <span class="focused-label" id="focused-section-label">Section: Header & Abstract</span>
+          <img src="poster_assets/step1_intro.jpg" alt="Poster Section" class="focused-img" id="focused-img">
+        </div>
+
+        <!-- Full Poster View (hidden by default) -->
+        <div class="full-poster-wrapper" id="full-poster-wrapper" style="display: none;">
+          <img src="poster_assets/poster_2400.jpg" alt="Full Poster" class="full-poster-img" id="full-poster-img">
+          <!-- 6 Hotspots overlay -->
+          <div class="hotspot-box active" id="hotspot-1" style="top:0%;left:0%;width:100%;height:25%;" onclick="goToStep(1)">
+            <span class="hotspot-badge">1. 開場與介紹</span>
+          </div>
+          <div class="hotspot-box" id="hotspot-2" style="top:25%;left:0%;width:28%;height:40%;" onclick="goToStep(2)">
+            <span class="hotspot-badge">2. 背景與動機</span>
+          </div>
+          <div class="hotspot-box" id="hotspot-3" style="top:15%;left:28%;width:72%;height:50%;" onclick="goToStep(3)">
+            <span class="hotspot-badge">3. APP 主要功能</span>
+          </div>
+          <div class="hotspot-box" id="hotspot-4" style="top:65%;left:0%;width:28%;height:35%;" onclick="goToStep(4)">
+            <span class="hotspot-badge">4. 服務設計</span>
+          </div>
+          <div class="hotspot-box" id="hotspot-5" style="top:65%;left:28%;width:54%;height:22%;" onclick="goToStep(5)">
+            <span class="hotspot-badge">5. 評估與指標</span>
+          </div>
+          <div class="hotspot-box" id="hotspot-6" style="top:82%;left:28%;width:72%;height:18%;" onclick="goToStep(6)">
+            <span class="hotspot-badge">6. 結論與展望</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Number Quick Check Modal -->
+  <div class="modal-backdrop" id="num-modal" onclick="closeModalOnBackdrop(event, 'num-modal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">🔢 Smart Learning App 關鍵數字速查卡</div>
+        <button class="btn-close" onclick="closeModal('num-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.88rem;color:var(--text-muted);">本卡整理報告中可能被評審詢問的量化試驗規格與服務參數：</p>
+        <table class="quick-table">
+          <thead>
+            <tr><th>項目名稱</th><th>數值 / 規格內容</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>試驗期程 (Study Duration)</td><td>12 週 (12-week prospective)</td></tr>
+            <tr><td>試驗分組 (Study Arms)</td><td>2 組 (App 介入組 vs 常規活動組)</td></tr>
+            <tr><td>活動頻率 (Frequency)</td><td>每週 2 次 (2 sessions / week)</td></tr>
+            <tr><td>單次時長 (Session Duration)</td><td>45 分鐘 / 次 (45 min / session)</td></tr>
+            <tr><td>團體人數 (Group Size)</td><td>6 – 10 位長者 / 組 (small-group)</td></tr>
+            <tr><td>核心模組數 (Core Modules)</td><td>3 大模組 (計算、朗讀、語意流暢度)</td></tr>
+            <tr><td>臨床評估量表 (Resident Scales)</td><td>5 項 (SPMSQ, FAB, GDS-SF15, CMAI, 60s語意)</td></tr>
+            <tr><td>服務設計原則 (Design Principles)</td><td>4 大支柱 (工作流整合、文化、易用、隱私)</td></tr>
+            <tr><td>IRB 核准字號</td><td>NYCU112062AF</td></tr>
+            <tr><td>研究基金資助 (Grant / Funding)</td><td>嚴慶齡醫學基金會 (Yen Tjing Ling Medical Foundation)</td></tr>
+            <tr><td>目前研究現況 (Current Status)</td><td>⚠️ 軟體系統已完成開發；機構實地評估預計進行中</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- QA Modal -->
+  <div class="modal-backdrop" id="qa-modal" onclick="closeModalOnBackdrop(event, 'qa-modal')">
+    <div class="modal-card" style="max-width: 800px;">
+      <div class="modal-header">
+        <div class="modal-title">🛡️ 海報評審必問 7 題庫（含應答心法）</div>
+        <button class="btn-close" onclick="closeModal('qa-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <details class="qa-details" open>
+          <summary class="qa-summary">❓ Q1. 臨床試驗做過了嗎？有沒有長者改善的數據？</summary>
+          <div class="qa-body">
+            <div class="qa-answer">
+              <strong>💡 建議回答 (English):</strong><br>
+              "The software development and service architecture are completed, but the facility-based clinical evaluation has not yet been conducted. In this paper, we report the workflow-aware service design, implementation principles, and the 12-week evaluation protocol under IRB approval NYCU112062AF."
+            </div>
+            <div class="qa-note">
+              📝 <strong>應答心法 (GAMMA 誠實準則)：</strong>千萬不要為了好看而捏造臨床療效或宣稱「已經證明有效」。誠實說明本篇是報告「系統開發、服務設計與前瞻臨床評估研究計畫」。
+            </div>
+          </div>
+        </details>
+
+        <details class="qa-details">
+          <summary class="qa-summary">❓ Q2. 什麼是學習療法（Learning Therapy）？它跟一般平板遊戲有何不同？</summary>
+          <div class="qa-body">
+            <div class="qa-answer">
+              <strong>💡 建議回答 (English):</strong><br>
+              "Learning Therapy was pioneered by Dr. Kawashima in Japan, using structured oral reading and basic arithmetic to stimulate frontal brain regions. Unlike individual entertainment apps, our service is workflow-aware: it is built specifically for facility caregivers to lead small groups on a shared screen, eliminating manual worksheet preparation and isolated tablet use."
+            </div>
+            <div class="qa-note">
+              📝 <strong>應答心法：</strong>強調不是丟給長者單獨玩 iPad，而是「照護員帶領小團體」的工作流整合。
+            </div>
+          </div>
+        </details>
+
+        <details class="qa-details">
+          <summary class="qa-summary">❓ Q3. 為什麼堅持「小團體共用大螢幕」，而不是讓長者一人一台平板？</summary>
+          <div class="qa-body">
+            <div class="qa-answer">
+              <strong>💡 建議回答 (English):</strong><br>
+              "In institutional dementia care, many residents have motor, sensory, or visual limitations that make independent tablet interaction frustrating. A shared display guided by staff fosters interpersonal social interactions, prevents isolation, and allows the caregiver to pace the session safely."
+            </div>
+            <div class="qa-note">
+              📝 <strong>應答心法：</strong>點出機構長者的身體限制（手部顫抖、視力退化）與團體社交帶來的正面心理效益。
+            </div>
+          </div>
+        </details>
+
+        <details class="qa-details">
+          <summary class="qa-summary">❓ Q4. 你們強調的「臺灣在地化文化內容」具體指什麼？</summary>
+          <div class="qa-body">
+            <div class="qa-answer">
+              <strong>💡 建議回答 (English):</strong><br>
+              "Translated foreign materials often lack personal relevance for Taiwanese seniors. We incorporated culturally familiar proverbs, traditional Taiwanese holidays, local landmarks, and nostalgic life experiences into our reading and verbal fluency modules, which stimulates autobiographical memory and spontaneous participation."
+            </div>
+            <div class="qa-note">
+              📝 <strong>應答心法：</strong>說明本土文化記憶能喚起自傳式記憶 (autobiographical memory)，提升開口與參與動機。
+            </div>
+          </div>
+        </details>
+
+        <details class="qa-details">
+          <summary class="qa-summary">❓ Q5. 長者的隱私與機構資料安全如何控管？</summary>
+          <div class="qa-body">
+            <div class="qa-answer">
+              <strong>💡 建議回答 (English):</strong><br>
+              "All resident activity logs are linked to de-identified study IDs with role-restricted permissions. No identifiable health records reside on the client screen, complying with institutional data governance and our approved IRB protocol."
+            </div>
+            <div class="qa-note">
+              📝 <strong>應答心法：</strong>去識別化 (De-identified) 與角色權限控管 (Role-restricted)，符合 IRB 規範。
+            </div>
+          </div>
+        </details>
+
+        <details class="qa-details">
+          <summary class="qa-summary">❓ Q6. 12 週試驗預計採用什麼統計模型分析？為什麼不用傳統 t 檢定？</summary>
+          <div class="qa-body">
+            <div class="qa-answer">
+              <strong>💡 建議回答 (English):</strong><br>
+              "We plan to use baseline-adjusted Linear Mixed-Effects Models (LMM) or Generalized Estimating Equations (GEE). Because measurements are taken longitudinally within group cohorts, LMM and GEE properly handle repeated within-subject correlation and group clustering, which simple t-tests cannot accommodate."
+            </div>
+            <div class="qa-note">
+              📝 <strong>應答心法：</strong>展現對長期追蹤 (longitudinal repeated measures) 與群體聚集效應 (clustering) 的統計嚴謹度。
+            </div>
+          </div>
+        </details>
+
+        <details class="qa-details">
+          <summary class="qa-summary">❓ Q7. 本篇論文對 IEEE HealthCom 的最大貢獻是什麼？</summary>
+          <div class="qa-body">
+            <div class="qa-answer">
+              <strong>💡 建議回答 (English):</strong><br>
+              "Our primary contribution is bridging the gap between digital health technology and real-world caregiving workflow. Rather than adding administrative burden, our app co-designs reusable group modules, automated session documentation, and cultural adaptation to enable sustainable eHealth deployment in dementia care."
+            </div>
+            <div class="qa-note">
+              📝 <strong>應答心法：</strong>點題「Workflow-Aware eHealth Service」——這正是 HealthCom 研討會最看重的落地實用價值。
+            </div>
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Injected Step Data
+    const STEPS = [{"id": 1, "step_num": 1, "title_zh": "1. 開場招呼與研究介紹", "title_en": "Greeting & Introduction", "timing": "0:00 - 0:35", "word_count": 45, "target_area": "Poster Header & Abstract", "image": "poster_assets/step1_intro.jpg", "hotspot": {"top": "0%", "left": "0%", "width": "100%", "height": "25%"}, "script_en": ["Hi! Thanks for stopping by!", "Would you like a quick overview of our project?", "Our project is the Smart Learning App.", "It's designed to support cognitive stimulation for older adults with dementia in long-term care facilities."], "script_zh": "嗨！謝謝你過來看看我們的海報！你想要我簡單介紹一下我們的研究嗎？我們的研究計畫稱為「智慧學習應用程式（Smart Learning App）」，主要是為了協助長期照護機構中的失智症長者進行認知刺激活動而設計的。", "cue_zh": "親切熱情開場，主動詢問參觀者是否需要簡介，快速點明標題、目標族群（機構失智長者）與核心目標（認知刺激）。", "key_points": ["研究主題：Smart Learning App 服務設計", "目標對象：長期照護機構失智症長者 (LTC facilities)", "核心任務：照護員引導之低負擔、小團體認知刺激活動"], "qa": [{"q": "What is the primary target population of this app?", "a": "Older adults with mild-to-moderate dementia living in long-term care facilities, accompanied and guided by facility care staff in small groups.", "note": "強調是機構照護員帶領小團體，不是讓長者單獨操作平板。"}]}, {"id": 2, "step_num": 2, "title_zh": "2. 研究背景與開發動機", "title_en": "Background & Motivation", "timing": "0:35 - 1:15", "word_count": 53, "target_area": "Section I: INTRODUCTION", "image": "poster_assets/step2_background.jpg", "hotspot": {"top": "25%", "left": "0%", "width": "28%", "height": "40%"}, "script_en": ["The idea is simple.", "Activities like reading aloud and basic arithmetic can be helpful, but care staff often spend time preparing materials and documenting sessions.", "So, we developed a web-based app to make these activities easier to deliver."], "script_zh": "其實，這項研究的核心概念很簡單。像是朗讀和基礎數學計算這類認知刺激活動，對失智症長者可能具有正面的幫助。然而，照護人員往往需要花費許多時間準備教材，以及記錄每次活動的執行情況。因此，我們開發了一款網頁式應用程式，讓這些認知刺激活動更容易安排與執行。", "cue_zh": "點出問題與痛點：學習療法有效，但傳統紙本備課累、手寫紀錄煩；我們的 App 就是為了解決照護現場的負擔。", "key_points": ["學術根基：Learning Therapy（朗讀＋基礎數學計算）", "現場痛點 1：照護人力短缺，紙本備課與教材整理耗時", "現場痛點 2：手寫紀錄負擔重，缺乏活動歷程數位化追蹤", "解決方案：Web-based App 降低備課時間，使活動易於落實"], "qa": [{"q": "What is the theoretical background of Learning Therapy?", "a": "Learning Therapy was developed by Dr. Ryuta Kawashima in Japan, using simple arithmetic and reading aloud to activate prefrontal brain regions in older adults with cognitive impairment.", "note": "可提及川島隆太教授的學習療法，日本與臺灣均有先導研究經驗。"}]}, {"id": 3, "step_num": 3, "title_zh": "3. APP 主要功能", "title_en": "Main Features", "timing": "1:15 - 1:55", "word_count": 47, "target_area": "Center: App Modules & Screens", "image": "poster_assets/step3_features.jpg", "hotspot": {"top": "15%", "left": "28%", "width": "72%", "height": "50%"}, "script_en": ["If you look here, in the center of our poster, you'll see three activities: simple arithmetic, oral reading, and semantic verbal fluency.", "We also use culturally familiar content for older adults in Taiwan."], "script_zh": "如果你看一下我們海報的中央，可以看到 APP 提供的三項主要活動：簡單數學計算、朗讀，以及語意流暢度訓練。此外，我們也採用了符合臺灣文化背景的活動內容，讓臺灣長者能夠接觸到更加熟悉的教材。", "cue_zh": "眼神引導參觀者看海報中央的 App 介面截圖，強調三大核心模組與「臺灣在地化文化素材」的特色。", "key_points": ["模組 1：基礎數學計算 (Simple Arithmetic) · 活化前額葉腦區", "模組 2：朗讀訓練 (Oral Reading) · 增進語言與專注力", "模組 3：語意流暢度訓練 (Semantic Verbal Fluency) · 詞彙提取與互動", "核心亮點：臺灣本土文化素材（在地地名、童年俚語、傳統節慶）"], "qa": [{"q": "Why is cultural localization crucial for cognitive stimulation?", "a": "Cultural relevance triggers long-term autobiographical memory and emotional resonance, which promotes sustained attention and spontaneous speech in dementia care.", "note": "外國翻譯教材對本土長者常缺乏情感連結，本土化能顯著提高長者主動參與意願。"}]}, {"id": 4, "step_num": 4, "title_zh": "4. APP 服務設計與操作流程", "title_en": "Service Design & Workflow", "timing": "1:55 - 2:40", "word_count": 54, "target_area": "Section II: SERVICE DESIGN PRINCIPLES", "image": "poster_assets/step4_workflow.jpg", "hotspot": {"top": "65%", "left": "0%", "width": "28%", "height": "35%"}, "script_en": ["What's different is that the app is designed for small groups, not just individual use.", "Care staff guide the activities on a shared screen, with large text, adjustable pacing, and session records."], "script_zh": "這款 APP 比較特別的地方在於，它是專門為小團體活動所設計的，而不只是提供個別長者單獨使用。照護人員可以透過共用螢幕帶領長者進行活動，而 APP 也提供大字體顯示、可調整活動進行速度，以及活動紀錄等功能，讓照護人員在實際執行時更加方便。", "cue_zh": "說明最大差異點：小團體活動而非孤立玩平板！共用電視大螢幕、照護員控速、大字體、後台一鍵記錄。", "key_points": ["團體引導模式：6–10 位長者共用大螢幕，照護人員主持帶領", "介面親善：高對比大字體、節奏可控、降低視力與認知負荷", "行政數位化：自動記錄活動出席與完成狀態，省去紙本謄寫", "隱私權限控管：去識別化代碼，分層權限管理確保機構資安"], "qa": [{"q": "How does this service design support care staff in real-world facilities?", "a": "By shifting from manual worksheet preparation to leader-controlled digital modules, it reduces prep time and cognitive burden for caregivers, fostering consistent group facilitation.", "note": "強調 workflow-aware：順應既有團體活動流程，而非硬塞複雜技術給照護員。"}]}, {"id": 5, "step_num": 5, "title_zh": "5. 研究設計與成效評估", "title_en": "Study Design & Evaluation", "timing": "2:40 - 3:35", "word_count": 84, "target_area": "Section III: SERVICE METRICS, OUTCOMES, AND ANALYSIS", "image": "poster_assets/step5_evaluation.jpg", "hotspot": {"top": "65%", "left": "28%", "width": "54%", "height": "22%"}, "script_en": ["And down here is our evaluation plan.", "We're planning a twelve-week, two-arm study comparing app-supported sessions with time-matched routine activities.", "The app group will have two forty-five-minute sessions each week, with six to ten residents per group.", "We'll assess how feasible and user-friendly the service is, along with potential changes in cognition, mood, and behavior.", "The app has been developed, but the facility-based evaluation has not yet been conducted."], "script_zh": "接著，如果你看一下海報的下方，可以看到我們規劃的研究評估方式。我們預計進行一項為期 12 週的兩組比較研究，比較使用 APP 輔助進行的認知刺激活動，以及相同時間長度的常規活動。在 APP 介入組中，我們預計每週安排兩次活動，每次 45 分鐘，每組由 6 至 10 位長者參與。我們將評估這項服務在實際照護環境中的可行性與易用性，同時探討長者在認知功能、情緒及行為表現方面可能產生的變化。目前 APP 已經完成開發，但照護機構中的實際評估研究尚未進行。", "cue_zh": "報出精準量化試驗規格（12週、2組、每週2次、每次45分、每組6-10人）。最後一句務必誠實聲明：系統開發完成，機構實地評估預計進行中！", "key_points": ["試驗架構：12 週雙組前瞻對照（App 介入組 vs 等時常規活動組）", "介入劑量：每週 2 次、每次 45 分鐘、每組 6–10 位長者", "實施評估指標：可行性、忠誠度、滿意易用度 (SUS)、出席率、不良事件", "長者臨床指標：SPMSQ (整體認知)、FAB (執行功能)、GDS-SF15 (憂鬱)、CMAI (躁動行為)、60秒語意流暢度", "統計分析架構：基準線校正之線性混合效應模型 (LMM) 或廣義估計方程式 (GEE)", "⚠️ 學術誠實底線：系統完成開發，機構試驗預計進行中，勿宣稱已有臨床療效數據"], "qa": [{"q": "Have you started the clinical trial or observed resident outcomes?", "a": "The app development and trial protocol are finalized under IRB NYCU112062AF, and the facility evaluation is planned. We do not report resident outcome data in this paper.", "note": "⚠️ 核心原則：千萬不能捏造臨床效果數據，明言「完成系統開發，機構臨床評估預計進行中」。"}, {"q": "Why use Linear Mixed Models (LMM) or GEE for statistical analysis?", "a": "Because outcome measurements are repeated over time (baseline, week 12) within small groups. LMM and GEE properly model within-subject correlation and group clustering effects.", "note": "展示對長期追蹤與小群體重複測量統計模型的專業掌握。"}]}, {"id": 6, "step_num": 6, "title_zh": "6. 研究結論與結尾互動", "title_en": "Conclusion & Closing", "timing": "3:35 - 4:05", "word_count": 40, "target_area": "Section IV: CONTRIBUTIONS & CONCLUSION", "image": "poster_assets/step6_conclusion.jpg", "hotspot": {"top": "82%", "left": "28%", "width": "72%", "height": "18%"}, "script_en": ["Overall, our goal is to bring traditional cognitive stimulation into everyday long-term care in a practical, culturally relevant way.", "That's a quick overview!", "Is there anything you'd like to ask?"], "script_zh": "整體而言，我們的目標是透過一種實用且符合在地文化的方式，將傳統認知刺激活動融入長期照護機構的日常照護工作中。以上就是我們研究的簡單介紹！請問你有任何想進一步了解的地方嗎？", "cue_zh": "有力收尾，總結貢獻（實用性＋文化相關性＋低負擔），親切邀請現場提問與互動。", "key_points": ["研究核心貢獻：將紙本學習療法轉化為機構可永續運作的數位健康服務", "設計哲學：以照護現場工作流為中心，兼顧文化契合度與低負擔", "後續規劃：機構試驗驗證實施成效，並做為未來個別化與擴展之基礎", "計畫核准與資助：陽明交大人體試驗委員會 NYCU112062AF，嚴慶齡醫學基金會"], "qa": [{"q": "What is the primary contribution of this work to IEEE HealthCom?", "a": "We address the translational gap between digital health technology and clinical workflow in dementia care by designing a workflow-aware eHealth service platform ready for sustainable real-world adoption.", "note": "點出 IEEE HealthCom 最看重的「健康資訊系統落地導入與工作流整合」價值。"}]}];
+
+    let currentStepIdx = 0;
+    let scriptMode = 'bilingual'; // 'bilingual', 'en', 'zh'
+    let viewMode = 'focus'; // 'focus', 'full'
+    let posterZoom = 1.0;
+
+    // Timer variables
+    let timerSeconds = 0;
+    let timerRunning = false;
+    let timerInterval = null;
+
+    function init() {
+      renderStep(currentStepIdx);
+      setupKeyboard();
+    }
+
+    function renderStep(idx) {
+      currentStepIdx = idx;
+      const step = STEPS[idx];
+
+      // Update navbar step badge
+      document.getElementById('badge-step-tag').textContent = `Step ${step.step_num} / ${STEPS.length}`;
+      document.getElementById('timing-tag').textContent = step.timing;
+      document.getElementById('words-tag').textContent = step.word_count;
+
+      // Update step pills
+      document.querySelectorAll('.step-pill').forEach((pill, i) => {
+        pill.classList.toggle('active', i === idx);
+      });
+
+      // Update hotspots on full poster
+      document.querySelectorAll('.hotspot-box').forEach((box, i) => {
+        box.classList.toggle('active', i === idx);
+      });
+
+      // Update Focused image & label
+      const focusedImg = document.getElementById('focused-img');
+      focusedImg.src = step.image;
+      document.getElementById('focused-section-label').textContent = step.target_area;
+
+      // Render Drawer Content
+      const drawer = document.getElementById('drawer-content');
+      let html = '';
+
+      // Title
+      html += `
+        <div class="section-title-wrap">
+          <div class="section-title-zh">${step.title_zh}</div>
+          <div class="section-title-en">${step.title_en}</div>
+        </div>
+      `;
+
+      // Cue Box
+      html += `
+        <div class="cue-box">
+          <span style="font-size:1.1rem;">💡</span>
+          <div><strong>應答提示：</strong>${step.cue_zh}</div>
+        </div>
+      `;
+
+      // English Script Block
+      if (scriptMode === 'bilingual' || scriptMode === 'en') {
+        html += `
+          <div class="script-box">
+            <div class="script-header-line">
+              <span>🎤 演講逐字稿 (Spoken Script · 點擊句子高亮)</span>
+              <span>${step.word_count} words</span>
+            </div>
+            <div class="script-sentences">
+              ${step.script_en.map((s, s_idx) => `
+                <p class="script-sentence ${s_idx === 0 ? 'highlighted' : ''}" onclick="highlightSentence(this)">${s}</p>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // Chinese Translation Block
+      if (scriptMode === 'bilingual' || scriptMode === 'zh') {
+        html += `
+          <div class="translation-box">
+            <div style="font-weight:700;margin-bottom:6px;color:#94a3b8;font-size:0.8rem;text-transform:uppercase;">🀄 中文對照</div>
+            <p>${step.script_zh}</p>
+          </div>
+        `;
+      }
+
+      // Key Points
+      html += `
+        <div class="key-points-card">
+          <div class="key-points-title">📌 本段核心論點速查</div>
+          <ul class="key-points-list">
+            ${step.key_points.map(pt => `<li>${pt}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+
+      // Step QA
+      if (step.qa && step.qa.length > 0) {
+        html += `
+          <div class="qa-accordion">
+            ${step.qa.map(item => `
+              <details class="qa-details" open>
+                <summary class="qa-summary">❓ ${item.q}</summary>
+                <div class="qa-body">
+                  <div class="qa-answer"><strong>💡 建議回答:</strong> ${item.a}</div>
+                  <div class="qa-note">📝 <strong>提示：</strong>${item.note}</div>
+                </div>
+              </details>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      drawer.innerHTML = html;
+      drawer.scrollTop = 0;
+    }
+
+    function highlightSentence(el) {
+      document.querySelectorAll('.script-sentence').forEach(p => p.classList.remove('highlighted'));
+      el.classList.add('highlighted');
+    }
+
+    function goToStep(stepNum) {
+      renderStep(stepNum - 1);
+    }
+
+    function nextStep() {
+      if (currentStepIdx < STEPS.length - 1) {
+        renderStep(currentStepIdx + 1);
+      }
+    }
+
+    function prevStep() {
+      if (currentStepIdx > 0) {
+        renderStep(currentStepIdx - 1);
+      }
+    }
+
+    function setScriptMode(mode) {
+      scriptMode = mode;
+      document.getElementById('tab-bilingual').classList.toggle('active', mode === 'bilingual');
+      document.getElementById('tab-en').classList.toggle('active', mode === 'en');
+      document.getElementById('tab-zh').classList.toggle('active', mode === 'zh');
+      renderStep(currentStepIdx);
+    }
+
+    function setViewMode(mode) {
+      viewMode = mode;
+      const btnFocus = document.getElementById('btn-mode-focus');
+      const btnFull = document.getElementById('btn-mode-full');
+      const focusContainer = document.getElementById('focused-view-container');
+      const fullContainer = document.getElementById('full-poster-wrapper');
+
+      if (mode === 'focus') {
+        btnFocus.classList.add('active');
+        btnFull.classList.remove('active');
+        focusContainer.style.display = 'flex';
+        fullContainer.style.display = 'none';
+      } else {
+        btnFocus.classList.remove('active');
+        btnFull.classList.add('active');
+        focusContainer.style.display = 'none';
+        fullContainer.style.display = 'inline-block';
+      }
+    }
+
+    function zoomPoster(delta) {
+      posterZoom = Math.min(Math.max(posterZoom + delta, 0.6), 2.5);
+      const target = viewMode === 'focus' ? document.getElementById('focused-img') : document.getElementById('full-poster-wrapper');
+      target.style.transform = `scale(${posterZoom})`;
+    }
+
+    function resetZoomPoster() {
+      posterZoom = 1.0;
+      const target = viewMode === 'focus' ? document.getElementById('focused-img') : document.getElementById('full-poster-wrapper');
+      target.style.transform = `scale(1)`;
+    }
+
+    // Timer Controls
+    const timerDisplay = document.getElementById('timer-display');
+    const timerBtn = document.getElementById('btn-timer');
+
+    function toggleTimer() {
+      if (timerRunning) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    }
+
+    function startTimer() {
+      timerRunning = true;
+      timerBtn.style.borderColor = 'var(--accent-emerald)';
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      timerRunning = false;
+      timerBtn.style.borderColor = 'var(--border-subtle)';
+      clearInterval(timerInterval);
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timerSeconds = 0;
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      if (timerSeconds >= 180) { // 3 mins warning
+        timerBtn.classList.add('timer-warn');
+      } else {
+        timerBtn.classList.remove('timer-warn');
+      }
+    }
+
+    timerBtn.addEventListener('click', toggleTimer);
+    timerBtn.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      resetTimer();
+    });
+
+    // Modals
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+    function closeModalOnBackdrop(e, id) {
+      if (e.target.id === id) closeModal(id);
+    }
+
+    // Keyboard Shortcuts
+    function setupKeyboard() {
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'n' || e.key === 'N') {
+          e.preventDefault();
+          nextStep();
+        } else if (e.key === 'ArrowLeft' || e.key === 'p' || e.key === 'P') {
+          e.preventDefault();
+          prevStep();
+        } else if (e.key >= '1' && e.key <= '6') {
+          goToStep(parseInt(e.key));
+        } else if (e.key === 't' || e.key === 'T') {
+          toggleTimer();
+        } else if (e.key === 'r' || e.key === 'R') {
+          resetTimer();
+        } else if (e.key === 'f' || e.key === 'F') {
+          setViewMode(viewMode === 'focus' ? 'full' : 'focus');
+        } else if (e.key === 'q' || e.key === 'Q') {
+          openModal('qa-modal');
+        } else if (e.key === 'Escape') {
+          closeModal('qa-modal');
+          closeModal('num-modal');
+        }
+      });
+    }
+
+    // Service Worker for offline capability
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(() => {
+          console.log('Service Worker Active (Offline Ready)');
+        }).catch(err => console.log('SW registration note:', err));
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
